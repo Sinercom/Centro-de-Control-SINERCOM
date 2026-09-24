@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<!-- saved from url=(0033)http://intranetsf.sinercom.local/ -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Control SINERCOM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link href="./Centro de Control SINERCOM_files/css2" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-body: #e4e7ec;
+            --bg-header: #0a2540;
+            --bg-card: #ffffff;
+            --text-primary: #0a2540;
+            --text-secondary: #566c8a;
+            --text-muted: #8fa4be;
+            --border-light: #eaeff7;
+            --border-medium: #d6e1ef;
+            --accent-blue: #2563eb;
+            --accent-blue-dark: #1e40af;
+            --accent-green: #059669;
+            --accent-purple: #7c3aed;
+            --accent-cyan: #0891b2;
+            --accent-amber: #d97706;
+            --accent-rose: #e11d48;
+            --accent-sharepoint: #0078d4;
+            --shadow-xs: 0 1px 2px rgba(10, 37, 64, 0.04);
+            --shadow-sm: 0 1px 3px rgba(10, 37, 64, 0.06), 0 1px 2px rgba(10, 37, 64, 0.03);
+            --shadow-md: 0 4px 12px rgba(10, 37, 64, 0.06), 0 2px 4px rgba(10, 37, 64, 0.04);
+            --shadow-lg: 0 12px 28px rgba(10, 37, 64, 0.09), 0 4px 10px rgba(10, 37, 64, 0.05);
+            --shadow-xl: 0 20px 40px rgba(10, 37, 64, 0.12), 0 8px 16px rgba(10, 37, 64, 0.06);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-body);
+            background-image:
+                radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 85% 100%, rgba(124, 58, 237, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #0a2540 0%, #14385f 50%, #1a3a5c 100%);
+            padding: 20px 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 8px 32px rgba(10, 37, 64, 0.18);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #0891b2 100%);
+        }
+        .app-header .logo-area { display: flex; align-items: center; gap: 18px; }
+        .app-header .logo-area img {
+            height: 46px; width: auto; background: #ffffff;
+            padding: 7px 14px; border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        .app-header .logo-area h1 {
+            color: #ffffff; font-size: 1.4rem;
+            font-weight: 800; letter-spacing: -0.025em;
+            line-height: 1.1;
+        }
+        .app-header .logo-area h1 span { color: #7cb3f0; font-weight: 500; }
+        .app-header .logo-area .subtitle {
+            display: block; font-size: 0.7rem; color: #8fb3d9;
+            font-weight: 600; letter-spacing: 0.12em;
+            text-transform: uppercase; margin-top: 4px;
+        }
+        .app-header .header-stats {
+            display: flex; gap: 10px; font-size: 0.82rem;
+            align-items: center;
+        }
+        .app-header .header-stats .stat-item {
+            background: rgba(255, 255, 255, 0.09);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #c8def2;
+            padding: 8px 18px; border-radius: 100px;
+            font-weight: 600; transition: all 0.25s ease; cursor: default;
+            backdrop-filter: blur(8px);
+        }
+        .edit-toggle {
+            background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%);
+            color: #1f2a7a;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 9px 16px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.18);
+        }
+        .edit-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 22px rgba(79, 70, 229, 0.22);
+        }
+        .edit-toggle.active {
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            color: #1d4ed8;
+        }
+        .app-header .header-stats .stat-item:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.24);
+            transform: translateY(-1px);
+        }
+        .app-header .header-stats .stat-item.clickable { cursor: pointer; }
+
+        .main-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 36px 44px 80px;
+        }
+
+        .search-section {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 10px 10px 10px 26px;
+            margin-bottom: 36px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .search-section:focus-within {
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.12);
+            border-color: #b8d0f0;
+            transform: translateY(-2px);
+        }
+        .search-section .search-icon {
+            font-size: 1.15rem; opacity: 0.45;
+            transition: opacity 0.2s ease;
+        }
+        .search-section:focus-within .search-icon { opacity: 0.8; }
+        .search-section input {
+            flex: 1; padding: 15px 8px; border: none;
+            font-size: 0.95rem; font-family: inherit; outline: none;
+            min-width: 200px; background: transparent;
+            color: var(--text-primary); font-weight: 500;
+        }
+        .search-section input::placeholder { color: var(--text-muted); font-weight: 400; }
+        .search-section .badge-total {
+            color: var(--text-secondary); font-weight: 600; font-size: 0.8rem;
+            white-space: nowrap; background: linear-gradient(135deg, #f0f5fc 0%, #e8f0fa 100%);
+            padding: 11px 20px; border-radius: 14px; letter-spacing: -0.01em;
+            border: 1px solid #e0e9f5;
+        }
+        .search-section .badge-total strong {
+            color: var(--accent-blue); font-size: 1.05rem;
+            font-weight: 700; font-family: 'JetBrains Mono', monospace;
+        }
+
+        .category-section { margin-bottom: 40px; }
+        .category-section .cat-header {
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 24px; padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .tool-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            box-shadow: 0 10px 24px rgba(30, 64, 175, 0.14);
+        }
+        .tool-card.drop-target {
+            border: 2px dashed #7c3aed;
+            background: #f8f5ff;
+        }
+        .drag-handle {
+            display: none;
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(124, 58, 237, 0.08);
+            color: #6d28d9;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            cursor: grab;
+        }
+        .edit-mode .drag-handle {
+            display: inline-flex;
+        }
+        .edit-mode .tool-card {
+            cursor: move;
+        }
+        .category-section .cat-header h2 {
+            font-size: 1.3rem; color: var(--text-primary);
+            font-weight: 800; letter-spacing: -0.025em;
+        }
+        .category-section .cat-header .count {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff; padding: 4px 16px; border-radius: 100px;
+            font-size: 0.72rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.03em;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+        }
+
+        /* ===== TARJETA FULL-WIDTH (Gestión Operativa) ===== */
+        .full-width-card-wrap {
+            margin-bottom: 28px;
+        }
+
+        /* ===== GRID MASONRY ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 22px;
+            align-items: start;
+        }
+
+        /* ===== TARJETAS ===== */
+        .tool-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 26px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            display: inline-flex;
+            width: 100%;
+            margin-bottom: 22px;
+            vertical-align: top;
+        }
+        .tool-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #0891b2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .tool-card:hover {
+            border-color: #c9dcf3;
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-4px);
+        }
+        .tool-card:hover::before { opacity: 1; }
+
+        /* Tarjeta destacada full-width */
+        .tool-card.featured {
+            background: linear-gradient(160deg, #fbfdff 0%, #f4f9ff 100%);
+            border-color: #c9dcf3;
+            margin-bottom: 0;
+            width: 100%;
+        }
+        .tool-card.people-card {
+            grid-column: 1 / -1;
+            display: flex;
+            width: 100%;
+            margin-bottom: 22px;
+        }
+        .tool-card.people-card .sub-sections-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .tool-card.people-card .card-desc {
+            display: grid;
+        }
+        .tool-card.logistics-card {
+            grid-column: 1 / -1;
+            display: flex;
+            width: 100%;
+            margin-bottom: 22px;
+        }
+        .logistics-card .logistics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+        .logistics-card .logistics-grid .sub-section {
+            margin-top: 0;
+            height: 100%;
+        }
+        .logistics-card .card-desc {
+            display: block;
+        }
+        .tool-card.featured::before { opacity: 1; }
+
+        /* Sub-secciones en grid horizontal */
+        .tool-card.featured .sub-sections-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+        .tool-card.featured .sub-sections-grid .sub-section {
+            margin-top: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tool-card.featured .sub-sections-grid .sub-section p {
+            flex: 1;
+        }
+
+        .tool-card .card-header-row {
+            display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;
+        }
+        .tool-card .card-icon-wrap {
+            flex-shrink: 0; width: 52px; height: 52px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.55rem;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0eefe 100%);
+            border: 1px solid #d4e6fd;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.08), inset 0 1px 0 rgba(255,255,255,0.8);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+        .tool-card:hover .card-icon-wrap {
+            transform: scale(1.1) rotate(-4deg);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18), inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .tool-card .card-title-wrap { flex: 1; min-width: 0; }
+        .tool-card .card-number {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.66rem; font-weight: 700;
+            color: var(--accent-blue);
+            background: linear-gradient(135deg, #eef4ff 0%, #dde9fe 100%);
+            padding: 3px 9px; border-radius: 7px;
+            margin-bottom: 6px; letter-spacing: 0.06em;
+            border: 1px solid #d8e5fb;
+        }
+        .tool-card .card-title {
+            font-weight: 800; font-size: 1.05rem;
+            color: var(--text-primary);
+            letter-spacing: -0.02em; line-height: 1.3;
+        }
+        .tool-card.featured .card-title {
+            font-size: 1.2rem;
+        }
+        .tool-card .card-desc {
+            font-size: 0.87rem; color: var(--text-secondary);
+            line-height: 1.7; margin-bottom: 20px;
+            font-weight: 450; letter-spacing: -0.005em;
+        }
+        .tool-card .card-desc p { margin-bottom: 8px; }
+        .tool-card .card-desc p:last-child { margin-bottom: 0; }
+        .tool-card .card-desc strong { color: var(--text-primary); font-weight: 700; }
+
+        .tool-card .card-desc .sub-section {
+            margin-top: 12px;
+            padding: 16px;
+            border-radius: 14px;
+            background: #ffffff;
+            border: 1px solid #e4ecf6;
+            font-size: 0.84rem;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+        .tool-card .card-desc .sub-section::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 12px; bottom: 12px;
+            width: 3px;
+            background: linear-gradient(180deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 0 3px 3px 0;
+            opacity: 0.7;
+        }
+        .tool-card .card-desc .sub-section:hover {
+            background: #f5f9ff;
+            border-color: #c9dcf3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.08);
+        }
+        .tool-card .card-desc .sub-section strong {
+            color: var(--text-primary);
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 6px;
+            font-size: 0.88rem; font-weight: 700;
+            letter-spacing: -0.015em;
+        }
+        .tool-card .card-desc .sub-section p {
+            color: var(--text-secondary); font-size: 0.8rem;
+            margin-bottom: 12px; line-height: 1.6;
+        }
+        .tool-card .card-desc .sub-section .sub-actions {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-top: auto;
+        }
+
+        .procedure-list {
+            margin-top: 10px; padding-left: 22px; font-size: 0.8rem;
+            color: var(--text-secondary); display: none; line-height: 1.8;
+        }
+        .procedure-list.open { display: block; }
+        .procedure-list li { margin-bottom: 3px; }
+        .procedure-list li::marker { color: var(--accent-blue); font-weight: 700; }
+
+        .btn-toggle {
+            background: none; border: none;
+            color: var(--accent-blue);
+            cursor: pointer; font-size: 0.78rem; font-weight: 700;
+            padding: 4px 0; font-family: inherit;
+            transition: all 0.15s ease;
+            display: inline-flex; align-items: center; gap: 4px;
+            letter-spacing: -0.01em;
+        }
+        .btn-toggle:hover {
+            color: var(--accent-blue-dark);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .tool-card .card-tags {
+            display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px;
+        }
+        .tool-card .card-tags .tag {
+            font-size: 0.62rem; font-weight: 700;
+            text-transform: uppercase;
+            padding: 5px 12px; border-radius: 100px;
+            letter-spacing: 0.07em;
+            border: 1px solid transparent;
+            transition: transform 0.2s ease;
+        }
+        .tool-card:hover .card-tags .tag { transform: translateY(-1px); }
+        .tag-herramienta { background: linear-gradient(135deg, #ecfeff 0%, #e0f7fa 100%); color: #0e7490; border-color: #cffafe; }
+        .tag-documento { background: linear-gradient(135deg, #fffbeb 0%, #fef5d5 100%); color: #b45309; border-color: #fef3c7; }
+        .tag-sharepoint { background: linear-gradient(135deg, #eff6ff 0%, #e0edff 100%); color: #0078d4; border-color: #dbeafe; }
+        .tag-externo { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); color: #6d28d9; border-color: #ede9fe; }
+
+        .tool-card .card-actions {
+            display: flex; gap: 9px; margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        .btn-link {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white; border: none;
+            padding: 10px 20px; border-radius: 11px;
+            font-size: 0.79rem; font-weight: 700; cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            font-family: inherit; letter-spacing: -0.01em;
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.22), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.32), inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+        .btn-link.outline {
+            background: #ffffff; color: var(--accent-blue);
+            border: 1.5px solid #c9dcf3; box-shadow: var(--shadow-xs);
+        }
+        .btn-link.outline:hover {
+            background: #f0f7ff; border-color: var(--accent-blue);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+        }
+        .btn-link.success {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 3px 8px rgba(5, 150, 105, 0.22), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-link.success:hover { box-shadow: 0 8px 20px rgba(5, 150, 105, 0.32); }
+        .btn-link.purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            box-shadow: 0 3px 8px rgba(124, 58, 237, 0.22), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-link.purple:hover { box-shadow: 0 8px 20px rgba(124, 58, 237, 0.32); }
+        .btn-link.sharepoint {
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            box-shadow: 0 3px 8px rgba(0, 120, 212, 0.22), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-link.sharepoint:hover { box-shadow: 0 8px 20px rgba(0, 120, 212, 0.32); }
+        .btn-link.warning {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            box-shadow: 0 3px 8px rgba(217, 119, 6, 0.22), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-link.warning:hover { box-shadow: 0 8px 20px rgba(217, 119, 6, 0.32); }
+        .btn-link.danger {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+            box-shadow: 0 3px 8px rgba(225, 29, 72, 0.22), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-link.danger:hover { box-shadow: 0 8px 20px rgba(225, 29, 72, 0.32); }
+
+        .btn-mini {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #ffffff; color: var(--accent-blue);
+            border: 1.5px solid #d4e3f5;
+            padding: 7px 15px;
+            border-radius: 9px;
+            font-size: 0.74rem; font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit; letter-spacing: -0.01em;
+            box-shadow: var(--shadow-xs);
+        }
+        .btn-mini:hover {
+            background: #f0f7ff; border-color: var(--accent-blue);
+            color: var(--accent-blue-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+        }
+        .btn-mini.sharepoint {
+            color: #0078d4; border-color: #dbeafe;
+        }
+        .btn-mini.sharepoint:hover {
+            background: #eff6ff; border-color: #0078d4;
+            color: #005a9e;
+        }
+        .btn-mini.success {
+            color: #059669; border-color: #c8e6d6;
+        }
+        .btn-mini.success:hover {
+            background: #ecfdf5; border-color: #059669;
+            color: #047857;
+        }
+        .btn-mini.warning {
+            color: #d97706; border-color: #fde5c0;
+        }
+        .btn-mini.warning:hover {
+            background: #fffbeb; border-color: #d97706;
+            color: #b45309;
+        }
+
+        .app-footer {
+            background: #ffffff;
+            border-top: 1px solid var(--border-light);
+            padding: 26px 44px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 40px;
+            font-weight: 500;
+        }
+        .app-footer strong { color: var(--text-primary); font-weight: 700; }
+
+        @media (max-width: 1300px) {
+            .tool-card.featured .sub-sections-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 1100px) {
+            .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .tool-card.featured .sub-sections-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .logistics-card .logistics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .app-header { flex-direction: column; align-items: stretch; padding: 16px 20px; }
+            .app-header .header-stats { justify-content: space-around; flex-wrap: wrap; }
+            .main-container { padding: 24px 20px 50px; }
+            .search-section { padding: 8px 8px 8px 20px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .tool-card.featured .sub-sections-grid {
+                grid-template-columns: 1fr;
+            }
+            .logistics-card .logistics-grid {
+                grid-template-columns: 1fr;
+            }
+            .app-footer { padding: 22px 20px; }
+        }
+        @media print {
+            .app-header, .search-section, .btn-link, .btn-toggle, .btn-mini { display: none !important; }
+            .tool-card { border: 1px solid #ccc; break-inside: avoid; page-break-inside: avoid; }
+            .procedure-list { display: block !important; }
+            body { background: white; }
+            .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        /* ===== PALETA SINERCOM ===== */
+        :root {
+            --palette-magenta: #dd2fb5;
+            --palette-purple: #7a29e6;
+            --palette-blue: #2632f0;
+            --palette-navy: #021241;
+            --bg-body: #f7f7ff;
+            --bg-header: var(--palette-navy);
+            --text-primary: var(--palette-navy);
+            --text-secondary: #4d5d86;
+            --text-muted: #7d89ad;
+            --border-light: #e7e8fb;
+            --border-medium: #cfd2f4;
+            --accent-blue: var(--palette-blue);
+            --accent-blue-dark: #1720b8;
+            --accent-purple: var(--palette-purple);
+            --accent-cyan: var(--palette-blue);
+            --shadow-xs: 0 1px 2px rgba(2, 18, 65, .05);
+            --shadow-sm: 0 3px 10px rgba(2, 18, 65, .07);
+            --shadow-md: 0 10px 26px rgba(2, 18, 65, .1);
+            --shadow-lg: 0 16px 34px rgba(2, 18, 65, .12);
+            --shadow-xl: 0 22px 44px rgba(2, 18, 65, .16);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            background-image:
+                radial-gradient(circle at 8% 0%, rgba(221, 47, 181, .12), transparent 34%),
+                radial-gradient(circle at 92% 8%, rgba(122, 41, 230, .1), transparent 32%),
+                radial-gradient(circle at 85% 100%, rgba(38, 50, 240, .09), transparent 36%);
+        }
+
+        .app-header {
+            background:
+                radial-gradient(circle at 76% -80%, rgba(221, 47, 181, .38), transparent 42%),
+                linear-gradient(125deg, var(--palette-navy) 0%, #11136a 52%, var(--palette-purple) 150%);
+            box-shadow: 0 10px 30px rgba(2, 18, 65, .24);
+        }
+        .app-header::after,
+        .tool-card::before {
+            background: linear-gradient(90deg, var(--palette-magenta), var(--palette-purple), var(--palette-blue));
+        }
+        .app-header .logo-area h1 span { color: #ef8bd8; }
+        .app-header .logo-area .subtitle { color: #c4b9ef; }
+
+        .search-section:focus-within {
+            box-shadow: 0 12px 32px rgba(38, 50, 240, .16);
+            border-color: #b9bdf8;
+        }
+        .search-section .badge-total {
+            background: linear-gradient(135deg, #fff0fb, #f0efff);
+            border-color: #e6d7fb;
+        }
+        .search-section .badge-total strong,
+        .btn-toggle { color: var(--palette-blue); }
+
+        .category-section .cat-header { border-bottom-color: #dddff8; }
+        .category-section .cat-header .count {
+            background: linear-gradient(135deg, var(--palette-magenta), var(--palette-purple) 55%, var(--palette-blue));
+            box-shadow: 0 5px 14px rgba(122, 41, 230, .3);
+        }
+
+        .tool-card { border-color: var(--border-light); }
+        .tool-card:hover { border-color: #c4c6f5; }
+        .tool-card.featured {
+            background: linear-gradient(150deg, #fffaff 0%, #f5f5ff 55%, #f0f2ff 100%);
+            border-color: #d8c9f7;
+        }
+        .tool-card .card-icon-wrap {
+            background: linear-gradient(135deg, #fff0fb 0%, #edeaff 100%);
+            border-color: #e0d3fb;
+            box-shadow: 0 4px 10px rgba(122, 41, 230, .12), inset 0 1px 0 rgba(255,255,255,.8);
+        }
+        .tool-card .card-number {
+            color: var(--palette-purple);
+            background: linear-gradient(135deg, #fff0fb, #eeeaff);
+            border-color: #e1d5fb;
+        }
+        .tool-card .card-desc .sub-section::before {
+            background: linear-gradient(180deg, var(--palette-magenta), var(--palette-purple), var(--palette-blue));
+        }
+        .tool-card .card-desc .sub-section:hover {
+            background: #faf9ff;
+            border-color: #ddd5fa;
+        }
+        .btn-link {
+            background: linear-gradient(135deg, var(--palette-blue), var(--palette-purple));
+            box-shadow: 0 4px 10px rgba(38, 50, 240, .25), inset 0 1px 0 rgba(255,255,255,.15);
+        }
+        .btn-link:hover {
+            box-shadow: 0 9px 22px rgba(122, 41, 230, .34), inset 0 1px 0 rgba(255,255,255,.2);
+        }
+        .btn-link.outline,
+        .btn-mini {
+            color: var(--palette-blue);
+            border-color: #cfd2f4;
+        }
+        .btn-link.outline:hover,
+        .btn-mini:hover {
+            background: #f4f2ff;
+            border-color: var(--palette-purple);
+            color: var(--palette-purple);
+        }
+        .btn-link.purple {
+            background: linear-gradient(135deg, var(--palette-purple), var(--palette-magenta));
+        }
+        .tag-herramienta {
+            background: linear-gradient(135deg, #fff0fb, #f2eaff);
+            color: #8d1db2;
+            border-color: #efd2fa;
+        }
+        .tag-documento {
+            background: linear-gradient(135deg, #f0efff, #e9e8ff);
+            color: #343cc4;
+            border-color: #d7d8ff;
+        }
+        .tag-sharepoint {
+            background: linear-gradient(135deg, #eceeff, #e4e6ff);
+            color: #2632c9;
+            border-color: #d0d4ff;
+        }
+        .tag-externo {
+            background: linear-gradient(135deg, #f8edff, #eee4ff);
+            color: #6b20bd;
+            border-color: #e5d4ff;
+        }
+        :is(a, button, input):focus-visible {
+            outline-color: rgba(221, 47, 181, .5);
+        }
+        body.auth-locked > :not(.access-gate) {
+            visibility: hidden;
+        }
+        .access-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(221, 47, 181, .3), transparent 38%),
+                linear-gradient(135deg, #021241 0%, #17146d 55%, #7a29e6 140%);
+        }
+        .access-gate-card {
+            width: min(100%, 390px);
+            padding: 34px;
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 22px;
+            color: #fff;
+            text-align: center;
+            background: rgba(2,18,65,.7);
+            box-shadow: 0 24px 70px rgba(0,0,0,.3);
+            backdrop-filter: blur(18px);
+        }
+        .access-gate-card .access-icon {
+            display: grid;
+            place-items: center;
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 18px;
+            border-radius: 18px;
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #dd2fb5, #7a29e6);
+        }
+        .access-gate-card h2 {
+            margin-bottom: 8px;
+            font-size: 1.35rem;
+        }
+        .access-gate-card p {
+            margin-bottom: 22px;
+            color: #d9d8f5;
+            font-size: .86rem;
+        }
+        .access-gate-card form {
+            display: flex;
+            gap: 9px;
+        }
+        .access-gate-card input {
+            min-width: 0;
+            flex: 1;
+            padding: 12px 14px;
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 10px;
+            color: #fff;
+            background: rgba(255,255,255,.1);
+            font: inherit;
+        }
+        .access-gate-card input::placeholder { color: #c9c9e8; }
+        .access-gate-card button {
+            padding: 12px 17px;
+            border: 0;
+            border-radius: 10px;
+            color: #fff;
+            background: linear-gradient(135deg, #dd2fb5, #7a29e6);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .access-error {
+            min-height: 20px;
+            margin-top: 12px;
+            color: #ffb4d9;
+            font-size: .78rem;
+        }
+        @media (max-width: 480px) {
+            .access-gate-card { padding: 26px 20px; }
+            .access-gate-card form { flex-direction: column; }
+        }
+
+        /* ===== TEMA OSCURO Y TARJETAS CENTRADAS ===== */
+        body {
+            background-color: #000000;
+            background-image:
+                radial-gradient(circle at 10% 0%, rgba(221, 47, 181, .12), transparent 32%),
+                radial-gradient(circle at 90% 15%, rgba(38, 50, 240, .12), transparent 34%);
+        }
+        .main-container {
+            max-width: 1360px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .category-section .cat-header {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .card-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 390px));
+            justify-content: center;
+        }
+        .tool-card.people-card,
+        .tool-card.logistics-card,
+        .full-width-card-wrap {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .app-footer {
+            background: #050505;
+            border-top-color: #222222;
+        }
+    </style>
+</head>
+<body class="">
+    
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <div class="logo-area">
+            <img src="./Centro de Control SINERCOM_files/cF2OURd.png" alt="SINERCOM">
+            <div>
+                <h1>Centro de Control <span>SINERCOM</span></h1>
+                <span class="subtitle">Recursos y Herramientas de Gestión</span>
+            </div>
+        </div>
+        <div class="header-stats">
+            <span class="stat-item">📌 13 recursos</span>
+            <button class="edit-toggle" id="editToggleBtn" type="button" aria-pressed="false">✏️ Editar</button>
+            <span class="stat-item clickable" onclick="window.print();">🖨️ Imprimir</span>
+        </div>
+    </header>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main-container">
+
+        <!-- BUSCADOR -->
+        <div class="search-section">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearch" placeholder="Buscar recurso, documento o herramienta..." onkeyup="filterCards()">
+            <span class="badge-total"><strong id="visibleCount">13</strong> / <span id="totalCount">13</span></span>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- CATEGORÍA ÚNICA: RECURSOS SINERCOM -->
+        <!-- ========================================================= -->
+        <div class="category-section" data-category="recursos">
+            <div class="cat-header">
+                <h2>📌 Recursos SINERCOM</h2>
+                <span class="count">13</span>
+            </div>
+
+            <!-- ===== RESTO DEL MASONRY ===== -->
+            <div class="card-grid" id="grid-recursos">
+
+                <!-- 04. Gestión de Personas -->
+                <div class="tool-card featured people-card" data-search="postulantes candidatos formulario reclutamiento entrevista vak disk perfil psicologico cv alta empleado ingreso contrato seguro vida cuentas bancarias cbu apercibimientos stock ropa novedades liquidación cálculo choferes horarios manuales sinercom naaloo dashboard axion campus arca kpis polivalencias policompetencias sindicados federaciones 931 capacitaciones abrir" draggable="true">
+                    <div class="drag-handle" title="Mover tarjeta">⋮⋮</div>
+                    <div class="card-header-row">
+                        <div class="card-icon-wrap">👥</div>
+                        <div class="card-title-wrap">
+                            <span class="card-number">04</span>
+                            <div class="card-title">Gestión de Personas</div>
+                        </div>
+                    </div>
+                    <div class="card-desc sub-sections-grid">
+                        <div class="sub-section">
+                            <strong>📊 Dashboard</strong>
+                            <p>Panel de seguimiento y métricas de recursos humanos.</p>
+                            <div class="sub-actions">
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/People%20%26%20HR%20Management%20Ramayo%20v3.html?v=20260916" target="_blank" rel="noopener" class="btn-mini sharepoint">📊 Abrir</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>👥 Base de Postulantes</strong>
+                            <p>Formulario online para postulaciones y gestión de la base de talento.</p>
+                            <div class="sub-actions">
+                                <a href="https://docs.google.com/forms/d/1AeCnDK0FaVAnYPywz7VqWJRP3r9l5DeliDKmy8CssKc/edit" target="_blank" class="btn-mini">📝 Base de CVs</a>
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Gu%C3%ADa%20de%20Entrevistas%20-%20Playero%20y%20Shop%20Atenci%C3%B3n%20al%20Cliente.html" target="_blank" class="btn-mini">📝 VAK / DISK</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>📝 Datos para el Alta</strong>
+                            <p>Formulario de ingreso, contrato individual y seguro de vida.</p>
+                            <div class="sub-actions">
+                                <a href="https://forms.cloud.microsoft/r/pzbKheKAwE" target="_blank" class="btn-mini warning">A-Formulario</a>
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/CONTRATO%20INDIVIDUAL%20DE%20TRABAJO.html" target="_blank" class="btn-mini">B-Contrato</a>
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/seguro%20de%20Vida%20OBL.pdf" target="_blank" class="btn-mini danger">C-Seguro</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>🏦 Apertura de Cuentas</strong>
+                            <p>Registro y seguimiento de cuentas bancarias para el personal.</p>
+                            <div class="sub-actions">
+                                <a href="https://sinercomsantafe-my.sharepoint.com/:x:/g/personal/juan_ramayo_sinercom_ar/IQATvkp_j1VDTJ9vy7GaGbbzARYIDAIPl4GbcqOBjLoPjQM?e=yMaFvY" target="_blank" class="btn-mini sharepoint">🏦 Abrir recurso</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>⚠️ Apercibimientos</strong>
+                            <p>Registro y seguimiento de apercibimientos disciplinarios del personal.</p>
+                            <div class="sub-actions">
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Apercibimientos%20Disciplinarios.html" target="_blank" class="btn-mini warning">⚠️ Abrir</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>👕 Stock de Ropa</strong>
+                            <p>Control y gestión del stock de uniformes y vestimenta del personal.</p>
+                            <div class="sub-actions">
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Stock%20de%20Ropa.html" target="_blank" class="btn-mini sharepoint">👕 Stock de Ropa</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>📢 Novedades de Liquidación</strong>
+                            <p>Comunicados internos y novedades relacionadas con liquidaciones y sueldos.</p>
+                            <div class="sub-actions">
+                                <a href="https://sinercomsantafe-my.sharepoint.com/:x:/g/personal/juan_ramayo_sinercom_ar/IQBxdNzzbj-tQJzZSkQn70RrARQIDK3kjZkrlFHcKDEgnkM?e=MgfGvZ" target="_blank" class="btn-mini sharepoint">📢 Novedades</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>🧮 Cálculo Choferes</strong>
+                            <p>Herramienta para el cálculo de liquidaciones, viáticos y adicionales del personal conductor.</p>
+                            <div class="sub-actions">
+                                <a href="https://sinercomsantafe-my.sharepoint.com/:x:/g/personal/juan_ramayo_sinercom_ar/IQB77tXHAUe7R7jgCMAm54u5AYvwYlY4oelW1l2IcUArTpc?e=YzIDsN" target="_blank" class="btn-mini sharepoint">🧮 Cálculo Choferes</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>🕐 Horarios</strong>
+                            <p>Gestión de turnos, rotación y visualización de la programación semanal.</p>
+                            <div class="sub-actions">
+                                <a href="https://sinercomsantafe-my.sharepoint.com/:f:/g/personal/juan_ramayo_sinercom_ar/IgA_eIlOhK2HRYXUMHdLotLKAQQR79fyuo-ZvIrSvmbnako?e=6s6NHf" target="_blank" class="btn-mini sharepoint">📁 Horarios</a>
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Turnos%20Calendario%20v2.html" target="_blank" class="btn-mini success">📅 Hoy</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>📚 Manuales SINERCOM</strong>
+                            <p>Biblioteca de procedimientos, protocolos y documentación normativa.</p>
+                            <div class="sub-actions">
+                                <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Manual%20de%20Empleado%20SINERCOM.pdf" target="_blank" class="btn-mini">🏪 Empleado</a>
+                                <a href="https://www.santafe.gov.ar/assal/" target="_blank" class="btn-mini">🛡️ ASSAL</a>
+                            </div>
+                            <div class="sub-section">
+                                <strong>⚡ Generador Eléctrico</strong>
+                                <p>Manual y documentación de referencia del generador eléctrico.</p>
+                                <div class="sub-actions">
+                                    <span class="btn-mini">⚡ Enlace pendiente</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>📱 Naaloo</strong>
+                            <p>Comunicación interna, fichaje digital y administración del personal.</p>
+                            <div class="sub-actions">
+                                <a href="https://app.naaloo.com/admin/comunicados" target="_blank" class="btn-mini">🌐 Ir a Naaloo</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>🎓 Axion Campus</strong>
+                            <p>Plataforma de capacitación y formación continua para el personal de SINERCOM.</p>
+                            <div class="sub-actions">
+                                <a href="https://www.axioncampus.com/totara/dashboard/index.php" target="_blank" class="btn-mini">🌐 Ir a Axion Campus</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>🏛️ ARCA</strong>
+                            <p>Portal de trámites y gestiones ante la Agencia de Recaudación y Control Aduanero.</p>
+                            <div class="sub-actions">
+                                <a href="https://www.arca.gob.ar/" target="_blank" class="btn-mini">🌐 Ir a ARCA</a>
+                                <a href="https://sinercomsantafe-my.sharepoint.com/:f:/g/personal/juan_ramayo_sinercom_ar/Es7vQw9LxXpGkRp4YtG6VWgB" target="_blank" class="btn-mini sharepoint">🏛️ ARCA</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>🎯 KPIs · Polivalencias y Policompetencias</strong>
+                            <p>Indicadores de desempeño para medir polivalencias y policompetencias del personal.</p>
+                            <div class="sub-actions">
+                                <a href="https://sinercomsantafe-my.sharepoint.com/:f:/g/personal/juan_ramayo_sinercom_ar/IgAJPd6WKftkTYnvO7bQnIv1AaORRum77oSWcy2qPgz1EfU?e=aDegWf" target="_blank" class="btn-mini sharepoint">🎯 KPIs · Polivalencias</a>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <strong>⚖️ SINDICADOS-FEDERACIONES-931</strong>
+                            <p>Información sobre sindicatos, federaciones gremiales y documentación del Formulario 931 de AFIP.</p>
+                            <div class="sub-actions">
+                                <a href="https://sinercomsantafe-my.sharepoint.com/:f:/g/personal/juan_ramayo_sinercom_ar/IgCkr-ajygxTRKgFp_8t3h6GAWUHSKiwNDuNIR_G53az5h4?e=r2DUt1" target="_blank" class="btn-mini sharepoint">⚖️ Abrir recurso</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag tag-herramienta">Herramienta</span>
+                        <span class="tag tag-sharepoint">SharePoint</span>
+                    </div>
+                </div>
+
+                <!-- 07. Logística -->
+                <div class="tool-card logistics-card" data-search="logística epp elementos protección personal carnet licencias vencimientos preocupacionales" draggable="true">
+                    <div class="drag-handle" title="Mover tarjeta">⋮⋮</div>
+                    <div class="card-header-row">
+                        <div class="card-icon-wrap">🚚</div>
+                        <div class="card-title-wrap">
+                            <span class="card-number">07</span>
+                            <div class="card-title">Logística</div>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        Gestión y seguimiento de documentación, elementos y requisitos operativos del personal.
+                        <div class="sub-sections-grid logistics-grid">
+                            <div class="sub-section">
+                                <strong>🦺 EPP</strong>
+                                <p>Entrega y control de elementos de protección personal.</p>
+                            </div>
+                            <div class="sub-section">
+                                <strong>🪪 Carnet</strong>
+                                <p>Registro y seguimiento de carnets habilitantes.</p>
+                            </div>
+                            <div class="sub-section">
+                                <strong>📅 Licencias y vencimientos</strong>
+                                <p>Control de fechas de vencimiento y renovaciones.</p>
+                            </div>
+                            <div class="sub-section">
+                                <strong>🩺 Preocupacionales</strong>
+                                <p>Seguimiento de estudios preocupacionales del personal.</p>
+                            </div>
+                            <div class="sub-section">
+                                <strong>📏 Kilómetros</strong>
+                                <p>Registro y seguimiento de kilómetros recorridos por los vehículos.</p>
+                                <div class="sub-actions">
+                                    <span class="btn-mini">📏 Enlace pendiente</span>
+                                </div>
+                            </div>
+                            <div class="sub-section">
+                                <strong>🎓 Capacitaciones</strong>
+                                <p>Formulario de capacitación y seguimiento asociado a ISO 9001.</p>
+                                <div class="sub-actions">
+                                    <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Formulario%20de%20Capacitacion%20ISO%209001.html" target="_blank" class="btn-mini purple">🎓 Abrir formulario</a>
+                                </div>
+                            </div>
+                            <div class="sub-section">
+                                <strong>📄 931</strong>
+                                <p>Gestión y seguimiento de documentación asociada al Formulario 931.</p>
+                                <div class="sub-actions">
+                                    <a href="https://serviciossegsoc.afip.gob.ar/djproforma/app/consultar/dj_generadas.aspx" target="_blank" rel="noopener" class="btn-mini sharepoint">📄 Declaración en línea - DDJJ presentadas</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag tag-herramienta">Gestión</span>
+                        <span class="tag tag-documento">RR.HH.</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== 01. GESTIÓN OPERATIVA (FULL WIDTH, FUERA DEL MASONRY) ===== -->
+            <div class="full-width-card-wrap">
+                <div class="tool-card featured" data-search="gestión operativa tareas turno descarga combustibles arqueo caja control camión san agustín operaciones dashboard" draggable="true">
+                    <div class="drag-handle" title="Mover tarjeta">⋮⋮</div>
+                    <div class="card-header-row">
+                        <div class="card-icon-wrap">⚙️</div>
+                        <div class="card-title-wrap">
+                            <span class="card-number">01</span>
+                            <div class="card-title">Gestión Operativa</div>
+                        </div>
+                    </div>
+                    <div class="card-desc">
+                        <p>Herramientas de control y seguimiento para las operaciones diarias.</p>
+                        <div class="sub-sections-grid">
+                            <div class="sub-section">
+                                <strong>📊 Dashboard</strong>
+                                <p>Tablero de control con indicadores y métricas.</p>
+                                <div class="sub-actions">
+                                    <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/People%20%26%20HR%20Management%20Ramayo%20v3.html?v=20260916" target="_blank" rel="noopener" class="btn-mini sharepoint">📊 Abrir</a>
+                                    <a href="https://ecenter.axionenergy.com/portal/customer-experience/full-dashboard" target="_blank" class="btn-mini purple">⭐ Reseñas</a>
+                                    <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Dash%20ID%20combustibles%20V1.html" target="_blank" class="btn-mini purple">⌚ Pulseras</a>
+                                </div>
+                            </div>
+                            <div class="sub-section">
+                                <strong>✅ Tareas en Turno</strong>
+                                <p>Asignación y control de tareas operativas.</p>
+                                <div class="sub-actions">
+                                    <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/planilla-tareas-turno.html" target="_blank" class="btn-mini">✅ Abrir</a>
+                                    <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Funciones%20Activas%20SHOP.html" target="_blank" class="btn-mini purple">🛍️ Tareas de Shop</a>
+                                </div>
+                            </div>
+                            <div class="sub-section">
+                                <strong>⛽ Descarga Combustibles</strong>
+                                <p>Registro y control de descargas. Incluye Planilla Camión San Agustín.</p>
+                                <div class="sub-actions">
+                                    <a href="https://juannorbertoramayo-commits.github.io/SINERCOM/Planilla%20Control%20de%20Descarga%20Camion%20San%20Agustin.html" target="_blank" class="btn-mini">⛽ Abrir</a>
+                                </div>
+                            </div>
+                            <div class="sub-section">
+                                <strong>💰 Arqueo de Caja</strong>
+                                <p>Control y arqueo diario de caja.</p>
+                                <div class="sub-actions">
+                                    <a href="https://sinercomsantafe-my.sharepoint.com/:f:/g/personal/juan_ramayo_sinercom_ar/IgDpzl4rrzZlQZKmcPTbdWRzAe98yPsqbkgNFcjre_2wFSY?e=pYEq7A" target="_blank" class="btn-mini">💰 Abrir</a>
+                                </div>
+                            </div>
+                            <div class="sub-section">
+                                <strong>⚡ Energy Center</strong>
+                                <p>Centro de recursos y documentación operativa del sector energético.</p>
+                                <div class="sub-actions">
+                                    <a href="https://ecenter.axionenergy.com/portal/customer-experience/full-dashboard" target="_blank" class="btn-mini sharepoint">⚡ Abrir Energy Center</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-tags">
+                        <span class="tag tag-herramienta">Herramienta</span>
+                        <span class="tag tag-sharepoint">SharePoint</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-section" data-category="cuentas-corrientes">
+            <div class="cat-header">
+                <h2>🏦 Cuentas Corrientes</h2>
+                <span class="count">1</span>
+            </div>
+            <div class="card-grid">
+                <div class="tool-card" data-search="cuentas corrientes descuentos" draggable="true">
+                    <div class="drag-handle" title="Mover tarjeta">⋮⋮</div>
+                    <div class="card-header-row">
+                        <div class="card-icon-wrap">💸</div>
+                        <div class="card-title-wrap">
+                            <span class="card-number">01</span>
+                            <div class="card-title">Descuentos</div>
+                        </div>
+                    </div>
+                    <div class="card-desc">Gestión y seguimiento de descuentos asociados a cuentas corrientes.</div>
+                    <div class="card-tags">
+                        <span class="tag tag-herramienta">Gestión</span>
+                        <span class="tag tag-sharepoint">SharePoint</span>
+                    </div>
+                    <div class="card-actions">
+                        <span class="btn-link outline">💸 Enlace pendiente</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="app-footer">
+        <p>📌 <strong>Centro de Control SINERCOM</strong> · Recursos y herramientas centralizados · Actualizado: <strong>Septiembre 2026</strong></p>
+    </footer>
+
+    <script>
+        (function() {
+            const accessKey = 'zazu2026';
+            const gate = document.getElementById('accessGate');
+            const form = document.getElementById('accessForm');
+            const input = document.getElementById('accessKey');
+            const error = document.getElementById('accessError');
+
+            if (!gate || !form || !input || !error) {
+                return;
+            }
+
+            function unlock() {
+                document.body.classList.remove('auth-locked');
+                gate.remove();
+                sessionStorage.setItem('sinercomAccess', 'granted');
+            }
+
+            if (sessionStorage.getItem('sinercomAccess') === 'granted') {
+                unlock();
+            } else {
+                input.focus();
+            }
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                if (input.value === accessKey) {
+                    unlock();
+                } else {
+                    error.textContent = 'La clave ingresada no es válida.';
+                    input.select();
+                }
+            });
+        })();
+
+        function filterCards() {
+            const query = document.getElementById('globalSearch').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.tool-card');
+            let visible = 0;
+
+            cards.forEach(card => {
+                const searchText = card.dataset.search || '';
+                const textContent = card.textContent.toLowerCase();
+                const match = (searchText + ' ' + textContent).includes(query) || query === '';
+                card.style.display = match ? 'inline-flex' : 'none';
+                if (match) visible++;
+            });
+
+            document.getElementById('visibleCount').textContent = visible;
+            document.getElementById('totalCount').textContent = cards.length;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const total = document.querySelectorAll('.tool-card').length;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('visibleCount').textContent = total;
+
+            const editToggleBtn = document.getElementById('editToggleBtn');
+            const grid = document.getElementById('grid-recursos');
+            const cards = Array.from(document.querySelectorAll('.tool-card'));
+
+            let dragCard = null;
+            let editMode = false;
+
+            function setEditMode(enabled) {
+                editMode = enabled;
+                document.body.classList.toggle('edit-mode', enabled);
+                editToggleBtn.classList.toggle('active', enabled);
+                editToggleBtn.setAttribute('aria-pressed', String(enabled));
+                editToggleBtn.textContent = enabled ? '✓ Guardar orden' : '✏️ Editar';
+
+                cards.forEach(card => {
+                    if (!card.parentElement) return;
+                    card.setAttribute('draggable', enabled ? 'true' : 'false');
+                });
+            }
+
+            editToggleBtn.addEventListener('click', function() {
+                setEditMode(!editMode);
+            });
+
+            cards.forEach(card => {
+                card.addEventListener('dragstart', function(event) {
+                    if (!editMode) return;
+                    dragCard = card;
+                    card.classList.add('dragging');
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', card.dataset.search || '');
+                });
+
+                card.addEventListener('dragend', function() {
+                    if (!editMode) return;
+                    card.classList.remove('dragging');
+                    dragCard = null;
+                    document.querySelectorAll('.tool-card').forEach(el => el.classList.remove('drop-target'));
+                });
+
+                card.addEventListener('dragover', function(event) {
+                    if (!editMode) return;
+                    event.preventDefault();
+                    card.classList.add('drop-target');
+                });
+
+                card.addEventListener('dragleave', function() {
+                    if (!editMode) return;
+                    card.classList.remove('drop-target');
+                });
+
+                card.addEventListener('drop', function(event) {
+                    if (!editMode || !dragCard || dragCard === card) return;
+                    event.preventDefault();
+                    card.classList.remove('drop-target');
+
+                    const cardsInGrid = Array.from(grid.children);
+                    const fromIndex = cardsInGrid.indexOf(dragCard);
+                    const toIndex = cardsInGrid.indexOf(card);
+
+                    if (fromIndex < 0 || toIndex < 0) return;
+                    const [movedCard] = cardsInGrid.splice(fromIndex, 1);
+                    cardsInGrid.splice(toIndex, 0, movedCard);
+                    cardsInGrid.forEach(item => grid.appendChild(item));
+                });
+            });
+        });
+
+        function toggleProcedureList(btn) {
+            const list = btn.nextElementSibling;
+            if (list.classList.contains('open')) {
+                list.classList.remove('open');
+                btn.textContent = '📋 Ver índice completo';
+            } else {
+                list.classList.add('open');
+                btn.textContent = '📋 Ocultar índice';
+            }
+        }
+    </script>
+
+
+</body></html>
