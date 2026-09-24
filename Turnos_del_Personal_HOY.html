@@ -48,6 +48,10 @@
     transition: background .15s, color .15s, border-color .15s}
   .btn-edit:hover{background:#1e1030}
   .btn-edit.active{background:var(--pink); color:#0a0a0a; border-color:var(--pink)}
+  .btn-theme{border:1px solid var(--bd);background:var(--card);color:var(--tx);
+    font:inherit;font-size:13px;font-weight:800;padding:6px 12px;border-radius:999px;cursor:pointer;
+    transition:background .15s,color .15s,border-color .15s}
+  .btn-theme:hover{background:var(--hover)}
   .nav{display:flex;align-items:center;gap:2px;padding:4px 8px 0}
   .arrow{width:44px;height:44px;flex:0 0 auto;border:0;background:transparent;
     font-size:28px;line-height:1;color:#64748b;border-radius:12px;cursor:pointer;
@@ -396,6 +400,21 @@
     overscroll-behavior-x: contain;
     scroll-snap-type: x proximity;
   }
+  body.light-theme{
+    --bg:#ffffff; --card:#ffffff; --tx:#172033; --tx2:#64748b; --bd:#dbe2ec;
+    --card2:#f4f7fb; --hover:#eef2f7; --navy:#172033;
+  }
+  body.light-theme .topbar{background:rgba(255,255,255,.94)}
+  body.light-theme .tabs{background:#eef2f7}
+  body.light-theme .tab{color:#64748b}
+  body.light-theme .celda{background:#f4f7fb}
+  body.light-theme .celda .num{color:#334155}
+  body.light-theme .turno{border-bottom-color:#e2e8f0}
+  body.light-theme .badge{background:#e2e8f0;color:#64748b}
+  body.light-theme .hora{color:#334155}
+  body.light-theme .edit-input,
+  body.light-theme .edit-color-item{background:#ffffff;color:var(--tx)}
+  body.light-theme .btn-edit.active{color:#ffffff}
 
 </style>
 </head>
@@ -426,6 +445,7 @@
       </div>
     </div>
     <div class="bar-actions">
+      <button id="btnTheme" class="btn-theme" title="Cambiar tema" aria-pressed="false">☀️ Tema claro</button>
       <button id="btnEdit" class="btn-edit" title="Editar planillas">✏️ Editar</button>
       <button id="btnHoy" class="hoy">Hoy</button>
     </div>
@@ -459,6 +479,26 @@
 </div>
 
 <script>
+/* ================================================================
+   TEMA CLARO / OSCURO
+   ================================================================ */
+(function setupTheme(){
+  const btn = document.getElementById('btnTheme');
+  const saved = localStorage.getItem('sinercomTheme') || 'dark';
+  function setTheme(theme){
+    const dark = theme === 'dark';
+    document.body.classList.toggle('dark-theme', dark);
+    document.body.classList.toggle('light-theme', !dark);
+    btn.setAttribute('aria-pressed', String(dark));
+    btn.textContent = dark ? '☀️ Tema claro' : '🌙 Tema oscuro';
+    localStorage.setItem('sinercomTheme', theme);
+  }
+  setTheme(saved);
+  btn.addEventListener('click', function(){
+    setTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark');
+  });
+})();
+
 /* ================================================================
    PWA
    ================================================================ */
