@@ -117,6 +117,21 @@
             background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
             color: #1d4ed8;
         }
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            padding: 9px 16px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
         .app-header .header-stats .stat-item:hover {
             background: rgba(255, 255, 255, 0.16);
             border-color: rgba(255, 255, 255, 0.24);
@@ -809,6 +824,55 @@
                 radial-gradient(circle at 10% 0%, rgba(221, 47, 181, .12), transparent 32%),
                 radial-gradient(circle at 90% 15%, rgba(38, 50, 240, .12), transparent 34%);
         }
+        body.light-theme {
+            background-color: #ffffff;
+            background-image: none;
+        }
+        body.dark-theme {
+            --bg-body: #000000;
+            --text-primary: #f4f4f5;
+            --text-secondary: #c4c4cc;
+            --text-muted: #9b9ba8;
+            --border-light: #27272a;
+            --border-medium: #3f3f46;
+            color-scheme: dark;
+        }
+        body.dark-theme .search-section,
+        body.dark-theme .tool-card,
+        body.dark-theme .tool-card.featured,
+        body.dark-theme .full-width-card-wrap,
+        body.dark-theme .sub-section {
+            background: #111111;
+            border-color: #303036;
+            color: #f4f4f5;
+        }
+        body.dark-theme .search-section .badge-total,
+        body.dark-theme .tool-card .card-icon-wrap,
+        body.dark-theme .tool-card .card-number {
+            background: #1b1b1f;
+            border-color: #38383f;
+        }
+        body.dark-theme .search-section input,
+        body.dark-theme .tool-card .card-title,
+        body.dark-theme .category-section .cat-header h2,
+        body.dark-theme .card-desc,
+        body.dark-theme .sub-section strong,
+        body.dark-theme .sub-section p {
+            color: #f4f4f5;
+        }
+        body.dark-theme .tool-card .card-desc .sub-section:hover {
+            background: #1d1d22;
+            border-color: #4b3a63;
+        }
+        body.dark-theme .app-footer {
+            background: #09090b;
+            border-top-color: #27272a;
+            color: #bdbdc7;
+        }
+        body.dark-theme .theme-toggle {
+            background: #f4f4f5;
+            color: #18181b;
+        }
         .main-container {
             max-width: 1360px;
             margin-left: auto;
@@ -850,6 +914,7 @@
         </div>
         <div class="header-stats">
             <span class="stat-item">📌 13 recursos</span>
+            <button class="theme-toggle" id="themeToggleBtn" type="button" aria-pressed="false">☀️ Tema claro</button>
             <button class="edit-toggle" id="editToggleBtn" type="button" aria-pressed="false">✏️ Editar</button>
             <span class="stat-item clickable" onclick="window.print();">🖨️ Imprimir</span>
         </div>
@@ -1232,6 +1297,23 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const savedTheme = localStorage.getItem('sinercomTheme') || 'dark';
+
+            function setTheme(theme) {
+                const dark = theme === 'dark';
+                document.body.classList.toggle('dark-theme', dark);
+                document.body.classList.toggle('light-theme', !dark);
+                themeToggleBtn.setAttribute('aria-pressed', String(dark));
+                themeToggleBtn.textContent = dark ? '☀️ Tema claro' : '🌙 Tema oscuro';
+                localStorage.setItem('sinercomTheme', theme);
+            }
+
+            setTheme(savedTheme);
+            themeToggleBtn.addEventListener('click', function() {
+                setTheme(document.body.classList.contains('dark-theme') ? 'light' : 'dark');
+            });
+
             const total = document.querySelectorAll('.tool-card').length;
             document.getElementById('totalCount').textContent = total;
             document.getElementById('visibleCount').textContent = total;
