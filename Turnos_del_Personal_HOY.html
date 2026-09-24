@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>Turnos por Unidad de Negocio</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Turnos">
+<meta name="application-name" content="Turnos">
+<meta name="description" content="Calendario unificado de turnos por unidad de negocio">
+<link id="manifestLink" rel="manifest">
+<link id="appleIcon" rel="apple-touch-icon">
+<style>
+  :root{
+    --pink:#f472b6; --purple:#a78bfa; --blue:#60a5fa; --navy:#e2e8f0;
+    --grad: linear-gradient(135deg, #DD2FB5 0%, #7A29E6 50%, #2632F0 100%);
+    --bg:#0a0a0a; --card:#141414; --tx:#f1f5f9; --tx2:#94a3b8; --bd:#262626;
+    --card2:#1a1a1a; --hover:#1f1f1f;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg); color:var(--tx); -webkit-font-smoothing:antialiased; overscroll-behavior-y:contain;
+    min-height:100dvh}
+  .topbar{position:sticky; top:0; z-index:20; background:rgba(10,10,10,.92);
+    -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--bd); padding-top:env(safe-area-inset-top)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 0}
+  .brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+  .logo-s{width:40px;height:40px;flex:0 0 auto;display:block}
+  .brand-info{display:flex;flex-direction:column;min-width:0;flex:1}
+  .brand-name{font-weight:800;font-size:14px;letter-spacing:-.01em;line-height:1.15;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx)}
+  .brand-clock{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--tx2);
+    font-weight:600;margin-top:1px;white-space:nowrap;overflow:hidden}
+  .reloj{font-variant-numeric:tabular-nums;color:#60a5fa;font-weight:800;letter-spacing:.02em}
+  .sep-clock{color:#404040}
+  .bar-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+  .hoy{border:1px solid var(--bd);background:var(--card);color:var(--tx);
+    font:inherit;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;cursor:pointer}
+  .hoy:active{background:var(--hover)}
+  .btn-edit{border:1px solid var(--purple); background:var(--card); color:var(--purple);
+    font:inherit; font-size:13px; font-weight:800;
+    padding:6px 14px; border-radius:999px; cursor:pointer;
+    transition: background .15s, color .15s, border-color .15s}
+  .btn-edit:hover{background:#1e1030}
+  .btn-edit.active{background:var(--pink); color:#0a0a0a; border-color:var(--pink)}
+  .nav{display:flex;align-items:center;gap:2px;padding:4px 8px 0}
+  .arrow{width:44px;height:44px;flex:0 0 auto;border:0;background:transparent;
+    font-size:28px;line-height:1;color:#64748b;border-radius:12px;cursor:pointer;
+    display:grid;place-items:center;padding:0 0 3px}
+  .arrow:active{background:var(--hover);color:var(--tx)}
+  .titulo{flex:1;text-align:center;font-size:16px;font-weight:800;letter-spacing:-.01em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--tx)}
+  .tabs{display:flex;gap:4px;margin:8px 12px 8px;background:#1a1a1a;padding:4px;border-radius:14px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:0 0 auto;min-width:52px;border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:700;
+    color:#64748b;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .15s,color .15s}
+  .tab.activo{background:var(--grad);color:#fff;box-shadow:0 2px 8px rgba(122,41,230,.35)}
+  .chips-wrap{display:flex;flex-direction:column;gap:6px;padding-bottom:10px}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:0 14px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chips:empty{display:none}
+  .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+    border:1px solid var(--bd);background:var(--card);color:var(--tx2);
+    font:inherit;font-size:13px;font-weight:700;
+    padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .chip i{width:8px;height:8px;border-radius:50%;background:var(--c,#94a3b8);display:block}
+  .chip.on{background:var(--c,#2632F0);border-color:var(--c,#2632F0);color:#fff}
+  .chip.on i{background:rgba(255,255,255,.9)}
+  main{padding:12px;display:flex;flex-direction:column;gap:12px;
+    max-width:720px;margin:0 auto;width:100%;
+    padding-bottom:calc(32px + env(safe-area-inset-bottom))}
+  main.wide{max-width:100%;padding:8px 4px;
+    padding-bottom:calc(32px + env(safe-area-inset-bottom));gap:10px}
+  main.wide .tabla-wrap{border-radius:10px}
+  main.wide .nq-wrap{border-radius:10px}
+  .fecha-grande{font-size:20px;font-weight:800;letter-spacing:-.02em;text-transform:capitalize;color:var(--tx)}
+  .sub{font-size:13px;color:var(--tx2);margin-top:3px;font-weight:600}
+  .unidad-bloque{background:var(--card);border-radius:16px;border:1px solid var(--bd);
+    overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+  .unidad-head{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;background:var(--card2);border-bottom:1px solid var(--bd);
+    border-left:4px solid var(--uc)}
+  .unidad-name{font-size:14px;font-weight:800;letter-spacing:-.01em}
+  .unidad-count{font-size:11px;font-weight:800;color:#fff;background:var(--uc);
+    padding:2px 9px;border-radius:999px}
+  .lugar-head{display:flex;align-items:center;gap:6px;padding:10px 14px 4px;
+    font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+  .lugar-head::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--uc)}
+  .turno{display:flex;align-items:center;gap:12px;background:var(--card);
+    padding:12px 14px;border-left:5px solid var(--c);border-bottom:1px solid var(--bd)}
+  .turno:last-child{border-bottom:0}
+  .avatar{width:38px;height:38px;flex:0 0 auto;border-radius:12px;
+    background:var(--c);color:#fff;display:grid;place-items:center;
+    font-size:13px;font-weight:800;letter-spacing:.02em}
+  .cuerpo{min-width:0;flex:1}
+  .fila1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .nombre{font-weight:700;font-size:15px}
+  .badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px;
+    background:#262626;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em}
+  .fila2{font-size:13px;color:var(--tx2);margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .hora{font-variant-numeric:tabular-nums;font-weight:700;color:#cbd5e1}
+  .sep{color:#404040}
+  .vacio{text-align:center;padding:52px 20px;color:var(--tx2);font-size:15px;font-weight:600;
+    background:var(--card);border-radius:16px;border:1px dashed var(--bd)}
+  .vacio-mini{padding:12px 14px;font-size:13px;color:#94a3b8;font-weight:600}
+  .bloque-dia{background:var(--card);border-radius:16px;border:1px solid var(--bd);overflow:hidden}
+  .bloque-dia.hoy{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.35)}
+  .bloque-head{display:flex;justify-content:space-between;align-items:center;
+    padding:10px 14px;background:var(--card2);border-bottom:1px solid var(--bd)}
+  .dname{font-weight:800;font-size:14px;text-transform:capitalize;color:var(--tx)}
+  .dcount{font-size:12px;color:var(--tx2);font-weight:800}
+  .bloque-dia .turno{border-left:4px solid var(--c);border-bottom:1px solid #f1f5f9;padding:9px 12px}
+  .bloque-dia .turno:last-child{border-bottom:0}
+  .bloque-dia .avatar{width:30px;height:30px;border-radius:9px;font-size:11px}
+  .bloque-dia .nombre{font-size:13.5px}
+  .bloque-dia .badge{font-size:9px;padding:2px 6px}
+  .bloque-dia .fila2{font-size:11.5px;margin-top:2px}
+  .mes-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;
+    background:var(--card);padding:10px;border-radius:16px;border:1px solid var(--bd)}
+  .dow{text-align:center;font-size:11px;font-weight:800;color:#64748b;padding:6px 0;text-transform:uppercase}
+  .celda{aspect-ratio:1/1.1;border:1px solid transparent;background:#1a1a1a;border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    font:inherit;cursor:pointer;padding:2px;position:relative;min-height:44px}
+  .celda.vacia{background:transparent;cursor:default}
+  .celda .num{font-size:13px;font-weight:700;color:#cbd5e1;line-height:1}
+  .celda.hoy{background:#1e3a5f;border-color:#3b82f6}
+  .celda.hoy .num{color:#93c5fd}
+  .celda.sel{background:var(--grad);border-color:transparent}
+  .celda.sel .num{color:#fff}
+  .dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:100%}
+  .dots i{width:6px;height:6px;border-radius:50%;display:block}
+  .mas{position:absolute;bottom:2px;right:4px;font-size:9px;font-weight:800;color:#94a3b8}
+  .celda.sel .mas{color:#cbd5e1}
+  .descanso-bloque{background:var(--card);border-radius:16px;border:1px solid #78350f;
+    overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+  .descanso-head{display:flex;align-items:center;justify-content:space-between;
+    padding:12px 14px;background:#1c1408;border-bottom:1px solid #78350f;
+    border-left:4px solid #f59e0b}
+  .descanso-title{display:flex;align-items:center;gap:7px;
+    font-size:14px;font-weight:800;letter-spacing:-.01em;color:#fbbf24}
+  .descanso-title .ico{font-size:15px;line-height:1}
+  .descanso-count{font-size:11px;font-weight:800;color:#0a0a0a;background:#f59e0b;
+    padding:2px 9px;border-radius:999px}
+  .descanso-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    gap:8px;padding:12px 14px}
+  .descanso-item{display:flex;align-items:center;gap:8px;
+    background:#1c1408;border:1px solid #3d2a0a;border-radius:10px;
+    padding:8px 10px;min-width:0}
+  .descanso-av{width:28px;height:28px;flex:0 0 auto;border-radius:8px;
+    background:var(--c);color:#fff;display:grid;place-items:center;
+    font-size:10.5px;font-weight:800;letter-spacing:.02em}
+  .descanso-info{min-width:0;flex:1}
+  .descanso-name{font-weight:800;font-size:11.5px;line-height:1.2;color:#fde68a;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .descanso-lugar{font-size:9.5px;color:#b45309;font-weight:700;margin-top:1px;
+    text-transform:uppercase;letter-spacing:.03em;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mes-chips{display:flex; gap:6px; flex-wrap:wrap; padding:8px 4px 10px; margin-bottom:4px; align-items:center;
+    position:sticky; top:0; z-index:5; background:var(--bg); padding-top:4px}
+  .mes-chips .mes-label{font-size:10.5px; font-weight:800; text-transform:uppercase;
+    letter-spacing:.08em; color:#64748b; margin-right:4px}
+  .mchip{flex:0 0 auto; border:1px solid var(--bd); background:var(--card); color:var(--tx2);
+    font:inherit; font-size:13px; font-weight:800;
+    padding:8px 16px; border-radius:999px; cursor:pointer;
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+    font-variant-numeric: tabular-nums; min-height:40px}
+  .mchip:hover{background:var(--hover)}
+  .mchip.on{color:#fff; border-color:transparent;
+    box-shadow:0 2px 10px rgba(122,41,230,.4)}
+  .mchip.on[data-mes=""] { background:var(--grad) }
+  .mchip.on[data-mes="9"] { background:#2632F0; border-color:#2632F0 }
+  .mchip.on[data-mes="10"]{ background:#7A29E6; border-color:#7A29E6 }
+  .mchip.on[data-mes="11"]{ background:#DD2FB5; border-color:#DD2FB5 }
+  .mchip.on[data-mes="12"]{ background:#1e293b; border-color:#334155 }
+  .edit-tools{background:var(--card); border-radius:12px; border:1px solid var(--bd);
+    padding:12px; margin-bottom:10px; box-shadow:0 1px 3px rgba(2,18,65,.06);
+    display:flex; flex-direction:column; gap:14px}
+  .edit-section{display:flex; flex-direction:column; gap:8px}
+  .edit-section-title{font-size:12.5px; font-weight:800; color:var(--navy);
+    padding-bottom:6px; border-bottom:1px dashed var(--bd);
+    display:flex; align-items:center; gap:6px}
+  .edit-section-title .hint-mini{font-size:10.5px; font-weight:600; color:#94a3b8; margin-left:auto}
+  .edit-tools-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .edit-input{flex:1; min-width:120px; padding:9px 11px; font:inherit; font-size:13px; font-weight:600;
+    border:1px solid var(--bd); border-radius:8px; background:#1a1a1a; color:var(--tx);
+    outline:none; transition:border-color .15s, box-shadow .15s}
+  .edit-input:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(38,50,240,.15)}
+  .edit-date-label{display:flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:800; color:var(--tx2);
+    text-transform:uppercase; letter-spacing:.04em; white-space:nowrap}
+  .edit-date-label .edit-input{min-width:135px; flex:0 0 auto; text-transform:none}
+  .edit-btn-apply{border:0; font:inherit; font-weight:800; font-size:13px;
+    padding:10px 20px; border-radius:8px; cursor:pointer;
+    background:var(--grad); color:#fff;
+    box-shadow:0 2px 6px rgba(122,41,230,.25);
+    transition:opacity .15s, transform .1s; white-space:nowrap}
+  .edit-btn-apply:hover{opacity:.9}
+  .edit-btn-apply:active{transform:translateY(1px)}
+  .edit-colors{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:6px}
+  .edit-color-item{display:flex; align-items:center; gap:8px;
+    padding:5px 8px; border:1px solid var(--bd); border-radius:8px;
+    background:#1a1a1a; cursor:pointer;
+    font-size:12px; font-weight:700; color:var(--navy);
+    transition:background .15s, border-color .15s}
+  .edit-color-item:hover{background:#222; border-color:#333}
+  .edit-color-item input[type="color"]{width:28px; height:28px; padding:0; border:1px solid var(--bd);
+    border-radius:6px; cursor:pointer; background:transparent; flex:0 0 auto}
+  .edit-color-item input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
+  .edit-color-item input[type="color"]::-webkit-color-swatch{border:0; border-radius:4px}
+  .edit-color-item input[type="color"]::-moz-color-swatch{border:0; border-radius:4px}
+  .edit-color-item span{flex:1; min-width:0;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .edit-color-item .reset{border:0; background:transparent; color:#94a3b8;
+    font:inherit; font-size:14px; font-weight:800;
+    padding:0 3px; cursor:pointer; line-height:1; flex:0 0 auto}
+  .edit-color-item .reset:hover{color:#dc2626}
+
+  /* ============================================================
+     TABLAS  (con celdas más anchas y nombres legibles)
+     ============================================================ */
+  .tabla-wrap{background:var(--card);border-radius:14px;border:1px solid var(--bd);
+    overflow:hidden;box-shadow:0 1px 2px rgba(2,18,65,.04);
+    display:flex;flex-direction:column; margin-bottom:6px}
+  .tabla-head{display:flex;align-items:center;gap:8px;
+    padding:11px 14px;background:var(--card2);border-bottom:1px solid var(--bd);
+    font-size:13px;font-weight:800;color:var(--tx)}
+  .tabla-head::before{content:"";width:6px;height:6px;border-radius:50%;
+    background:var(--tc,var(--blue));flex:0 0 auto}
+  .tabla-head .tc-sub{font-size:10.5px;color:#94a3b8;font-weight:600;margin-left:auto;white-space:nowrap}
+  .tabla-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+  .tabla-scroll::-webkit-scrollbar{height:7px}
+  .tabla-scroll::-webkit-scrollbar-track{background:#1a1a1a}
+  .tabla-scroll::-webkit-scrollbar-thumb{background:#404040;border-radius:4px}
+
+  table.shift-grid{border-collapse:separate;border-spacing:0;
+    font-size:10px;font-variant-numeric:tabular-nums}
+
+  table.shift-grid th{
+    border-right:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a;
+    padding:6px 4px;text-align:center;
+    min-width:58px;max-width:58px;
+    white-space:nowrap;
+    font-weight:800;line-height:1.2;
+  }
+  table.shift-grid td{
+    border-right:1px solid #2a2a2a;border-bottom:1px solid #2a2a2a;
+    padding:7px 3px;text-align:center;
+    min-width:58px;max-width:58px;
+    font-weight:700;line-height:1.15;
+    white-space:normal;
+    word-break:break-word;
+    hyphens:auto;
+    font-size:9.5px;
+    vertical-align:middle;
+    color:#e2e8f0;
+  }
+  table.shift-grid thead th{position:sticky;top:0;z-index:3;
+    background:#1e1e1e;color:#94a3b8;
+    font-weight:800;font-size:10px;letter-spacing:.01em}
+  table.shift-grid thead th.month-start{border-left:3px solid #60a5fa; background:#252525}
+  table.shift-grid tbody tr:last-child td{border-bottom:0}
+  table.shift-grid td:last-child{border-right:0}
+  table.shift-grid th:last-child{border-right:0}
+  table.shift-grid .sticky-col{
+    position:sticky;left:0;z-index:2;
+    background:#141414;text-align:left;
+    min-width:100px;max-width:100px;
+    border-right:2px solid #333;
+    font-weight:800;white-space:normal;line-height:1.25;
+    padding:8px 8px;
+    font-size:10px;
+    color:#f1f5f9;
+  }
+  table.shift-grid thead .sticky-col{z-index:4;background:#1e1e1e;font-size:10px;color:#94a3b8}
+  table.shift-grid .sticky-col .sc-sub{display:block;font-weight:600;color:#64748b;font-size:9px;margin-top:2px}
+  table.shift-grid td.cell-v{color:#e2e8f0}
+  table.shift-grid td.cell-empty{color:#404040;background:#111}
+
+  body.edit-mode table.shift-grid td[contenteditable="true"]{
+    background:#1a1a2e !important; color:#f1f5f9 !important;
+    outline:2px dashed var(--pink); outline-offset:-2px;
+    cursor:text; font-weight:700}
+  body.edit-mode table.shift-grid td[contenteditable="true"]:focus{
+    outline:2px solid var(--blue); background:#1e3a5f !important}
+  body.edit-mode .tabla-head{background:linear-gradient(90deg,#1a1020,#14101a)}
+  body.edit-mode .tabla-head::after{
+    content:"✏️ Editando nombres";
+    margin-left:auto; font-size:10.5px; font-weight:800; color:var(--pink)}
+
+  .nq-wrap{background:var(--card);border-radius:16px;border:1px solid var(--bd);
+    overflow:hidden;box-shadow:0 1px 2px rgba(2,18,65,.04)}
+  .nq-head{display:flex;align-items:center;gap:8px;
+    padding:12px 14px;background:linear-gradient(90deg,#1a1020,#14101a);
+    border-bottom:1px solid var(--bd);font-size:14px;font-weight:800;color:var(--tx)}
+  .nq-head::before{content:"";width:8px;height:8px;border-radius:50%;
+    background:var(--grad);flex:0 0 auto}
+  .nq-body{padding:14px}
+  .nq-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .nq-row.single{grid-template-columns:1fr}
+  .nq-field{display:flex;flex-direction:column;gap:4px}
+  .nq-field label{font-size:11px;font-weight:800;color:#64748b;
+    text-transform:uppercase;letter-spacing:.05em}
+  .nq-field input,
+  .nq-field select{font:inherit;font-size:14px;font-weight:600;
+    padding:9px 11px;border:1px solid var(--bd);border-radius:10px;
+    background:#1a1a1a;color:var(--tx);outline:none;
+    transition:border-color .15s, box-shadow .15s}
+  .nq-field input:focus,
+  .nq-field select:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(38,50,240,.15)}
+  .nq-actions{margin-top:6px;display:flex;gap:10px}
+  .nq-actions button{flex:1;border:0;font:inherit;font-weight:800;font-size:14px;
+    padding:12px;border-radius:12px;cursor:pointer;
+    transition:opacity .15s, transform .1s}
+  .nq-actions button:active{transform:translateY(1px)}
+  .btn-nq-add{background:var(--grad);color:#fff; box-shadow:0 3px 10px rgba(122,41,230,.25)}
+  .btn-nq-clear{background:#1a1a1a;color:var(--tx);flex:0 0 auto;padding:12px 18px;border:1px solid var(--bd)}
+  .nq-list{background:var(--card);border-radius:16px;border:1px solid var(--bd);
+    overflow:hidden;box-shadow:0 1px 2px rgba(2,18,65,.04)}
+  .nq-list-head{padding:11px 14px;background:var(--card2);border-bottom:1px solid var(--bd);
+    font-size:12px;font-weight:800;color:var(--navy);
+    display:flex;justify-content:space-between;align-items:center}
+  .nq-list-head .cnt{font-size:10.5px;font-weight:800;color:#fff;
+    background:var(--purple);padding:2px 9px;border-radius:999px}
+  .nq-item{display:flex;align-items:center;gap:10px;
+    padding:10px 14px;border-bottom:1px solid var(--bd)}
+  .nq-item:last-child{border-bottom:0}
+  .nq-item-info{flex:1;min-width:0}
+  .nq-item-name{font-weight:800;font-size:13.5px;color:var(--tx)}
+  .nq-item-meta{font-size:11.5px;color:#64748b;font-weight:600;margin-top:2px}
+  .nq-item-del{border:0;background:#2a1215;color:#f87171;
+    font:inherit;font-size:12px;font-weight:800;
+    padding:6px 12px;border-radius:999px;cursor:pointer}
+  .nq-item-del:hover{background:#3b1518}
+  .install-bar{position:fixed;left:12px;right:12px;
+    bottom:calc(14px + env(safe-area-inset-bottom));
+    background:var(--navy);color:#fff;
+    padding:11px 14px;border-radius:14px;
+    display:flex;align-items:center;gap:10px;
+    box-shadow:0 10px 30px rgba(2,18,65,.4);
+    z-index:999;font-size:13px;font-weight:700;
+    animation:slideUp .35s ease}
+  .install-bar[hidden]{display:none}
+  .install-emoji{font-size:18px;line-height:1}
+  .install-text{flex:1;min-width:0;line-height:1.25}
+  #btnInstall{border:0;font:inherit;font-weight:800;
+    background:var(--blue);color:#fff;
+    padding:8px 14px;border-radius:999px;cursor:pointer;flex:0 0 auto}
+  #btnInstall:active{background:var(--purple)}
+  #btnInstallClose{border:0;background:transparent;color:#94a3b8;
+    font-size:18px;cursor:pointer;padding:0 4px;flex:0 0 auto;line-height:1}
+  @keyframes slideUp{from{transform:translateY(120%);opacity:0}to{transform:translateY(0);opacity:1}}
+  .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));
+    transform:translateX(-50%) translateY(20px);
+    background:var(--navy);color:#fff;font-size:13px;font-weight:700;
+    padding:10px 18px;border-radius:999px;
+    box-shadow:0 8px 24px rgba(2,18,65,.35);
+    opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+    z-index:1100;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{background:#dc2626}
+  .toast.ok{background:#059669}
+
+  /* ===== Mobile comfort ===== */
+  @media (max-width: 480px) {
+    .bar { padding: 8px 10px 0; }
+    .logo-s { width: 34px; height: 34px; }
+    .brand-name { font-size: 13px; }
+    .tabs { margin: 6px 8px 6px; }
+    .tab { min-width: 48px; padding: 9px 10px; font-size: 12px; }
+    main { padding: 10px 8px; }
+    main.wide { padding: 6px 2px; }
+    .turno { padding: 11px 12px; gap: 10px; }
+    .avatar { width: 36px; height: 36px; font-size: 12px; }
+    .nombre { font-size: 14px; }
+    table.shift-grid th, table.shift-grid td {
+      min-width: 52px; max-width: 52px; font-size: 9px; padding: 5px 2px;
+    }
+    table.shift-grid .sticky-col {
+      min-width: 88px; max-width: 88px; font-size: 9.5px; padding: 6px 6px;
+    }
+    .mes-chips { padding: 6px 2px 8px; gap: 5px; }
+    .mchip { padding: 8px 14px; font-size: 12.5px; }
+    .celda { min-height: 42px; border-radius: 10px; }
+  }
+  /* touch targets */
+  .chip, .mchip, .tab, .hoy, .btn-edit, .arrow {
+    -webkit-user-select: none; user-select: none;
+  }
+  /* better table horizontal scroll feel */
+  .tabla-scroll {
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="bar">
+    <div class="brand">
+      <svg class="logo-s" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Logo">
+        <defs>
+          <linearGradient id="lgBrand" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#DD2FB5"/>
+            <stop offset="55%"  stop-color="#7A29E6"/>
+            <stop offset="100%" stop-color="#2632F0"/>
+          </linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="42" fill="none" stroke="url(#lgBrand)" stroke-width="8"/>
+        <path d="M 38 53 Q 34 41 47 33 L 68 25 Q 71 27 67 33 L 47 52 Q 42 56 38 53 Z" fill="url(#lgBrand)"/>
+        <path d="M 62 47 Q 66 59 53 67 L 32 75 Q 29 73 33 67 L 53 48 Q 58 44 62 47 Z" fill="url(#lgBrand)"/>
+      </svg>
+      <div class="brand-info">
+        <span class="brand-name">Turnos del Personal</span>
+        <span class="brand-clock">
+          <span id="fecha-hoy">—</span>
+          <span class="sep-clock">·</span>
+          <span id="reloj" class="reloj">--:--:--</span>
+        </span>
+      </div>
+    </div>
+    <div class="bar-actions">
+      <button id="btnEdit" class="btn-edit" title="Editar planillas">✏️ Editar</button>
+      <button id="btnHoy" class="hoy">Hoy</button>
+    </div>
+  </div>
+  <div class="nav">
+    <button id="prev" class="arrow" aria-label="Anterior">‹</button>
+    <div id="titulo" class="titulo">—</div>
+    <button id="next" class="arrow" aria-label="Siguiente">›</button>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab activo" data-v="hoy">HOY</button>
+    <button class="tab" data-v="dia">Día</button>
+    <button class="tab" data-v="semana">Semana</button>
+    <button class="tab" data-v="mes">Mes</button>
+    <button class="tab" data-v="sa">SA</button>
+    <button class="tab" data-v="gp">GP</button>
+    <button class="tab" data-v="nq">NQ</button>
+  </div>
+  <div class="chips-wrap">
+    <div class="chips" id="chipsUnidad"></div>
+  </div>
+</header>
+
+<main id="vista"></main>
+<div id="toast" class="toast"></div>
+<div id="installBar" class="install-bar" hidden>
+  <span class="install-emoji">📲</span>
+  <span class="install-text">Instalá esta app en tu celular</span>
+  <button id="btnInstall">Instalar</button>
+  <button id="btnInstallClose" aria-label="Cerrar">✕</button>
+</div>
+
+<script>
+/* ================================================================
+   PWA
+   ================================================================ */
+(function setupPWA(){
+  function makeIcon(size){
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    const s = size / 100;
+    ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0, 0, size, size);
+    const grad = ctx.createLinearGradient(0, 0, size, size);
+    grad.addColorStop(0,'#DD2FB5'); grad.addColorStop(0.55,'#7A29E6'); grad.addColorStop(1,'#2632F0');
+    ctx.beginPath(); ctx.arc(50*s, 50*s, 42*s, 0, Math.PI*2);
+    ctx.lineWidth = 8*s; ctx.strokeStyle = grad; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(38*s, 53*s); ctx.quadraticCurveTo(34*s, 41*s, 47*s, 33*s);
+    ctx.lineTo(68*s, 25*s); ctx.quadraticCurveTo(71*s, 27*s, 67*s, 33*s);
+    ctx.lineTo(47*s, 52*s); ctx.quadraticCurveTo(42*s, 56*s, 38*s, 53*s);
+    ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(62*s, 47*s); ctx.quadraticCurveTo(66*s, 59*s, 53*s, 67*s);
+    ctx.lineTo(32*s, 75*s); ctx.quadraticCurveTo(29*s, 73*s, 33*s, 67*s);
+    ctx.lineTo(53*s, 48*s); ctx.quadraticCurveTo(58*s, 44*s, 62*s, 47*s);
+    ctx.closePath(); ctx.fill();
+    return c.toDataURL('image/png');
+  }
+  const icon192 = makeIcon(192); const icon512 = makeIcon(512);
+  const startUrl = location.origin + location.pathname;
+  const manifest = { name:'Turnos del Personal', short_name:'Turnos',
+    description:'Calendario unificado de turnos por unidad de negocio',
+    start_url:startUrl,
+    scope: location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1) || '/',
+    display:'standalone', orientation:'portrait',
+    background_color:'#0a0a0a', theme_color:'#0a0a0a', lang:'es',
+    icons:[
+      { src: icon192, sizes:'192x192', type:'image/png', purpose:'any' },
+      { src: icon512, sizes:'512x512', type:'image/png', purpose:'any' },
+      { src: icon512, sizes:'512x512', type:'image/png', purpose:'maskable' }
+    ]
+  };
+  const manifestData = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+  document.getElementById('manifestLink').href = manifestData;
+  document.getElementById('appleIcon').href = icon192;
+  const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  const bar = document.getElementById('installBar');
+  const barText = bar.querySelector('.install-text');
+  const btnInstall = document.getElementById('btnInstall');
+  const btnClose = document.getElementById('btnInstallClose');
+  if (!isHTTPS || isStandalone) return;
+  let dismissed = 0;
+  try { dismissed = parseInt(localStorage.getItem('installBarDismissed') || '0', 10); } catch(_){}
+  const dismissActive = dismissed && (Date.now() - dismissed) < 7*24*60*60*1000;
+  let deferredPrompt = null, bipFired = false;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); deferredPrompt = e; bipFired = true;
+    if (!dismissActive){
+      barText.textContent = 'Instalá esta app en tu celular';
+      btnInstall.textContent = 'Instalar'; bar.hidden = false;
+    }
+  });
+  setTimeout(() => {
+    if (!bipFired && !dismissActive){
+      barText.textContent = isIOS ? 'Agregala a la pantalla de inicio desde Safari' : 'Instalá la app desde el menú de Chrome';
+      btnInstall.textContent = 'Cómo'; bar.hidden = false;
+    }
+  }, 4000);
+  btnInstall.addEventListener('click', async () => {
+    if (deferredPrompt){ deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch(_){}
+      deferredPrompt = null; bar.hidden = true; return; }
+    alert(isIOS ? 'iPhone/iPad:\n1. Compartir (⬆️).\n2. Añadir a pantalla de inicio.'
+                : 'Android:\n1. Menú Chrome (⋮).\n2. "Instalar aplicación".');
+  });
+  btnClose.addEventListener('click', () => {
+    bar.hidden = true;
+    try { localStorage.setItem('installBarDismissed', String(Date.now())); } catch(_){}
+  });
+  window.addEventListener('appinstalled', () => {
+    bar.hidden = true;
+    try { localStorage.removeItem('installBarDismissed'); } catch(_){}
+  });
+})();
+
+/* RELOJ */
+(function(){
+  const DIASC = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const MESESC = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const $f = document.getElementById('fecha-hoy');
+  const $r = document.getElementById('reloj');
+  function tick(){
+    const d = new Date();
+    $f.textContent = `${DIASC[d.getDay()]} ${d.getDate()} ${MESESC[d.getMonth()]} ${d.getFullYear()}`;
+    $r.textContent = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+  }
+  tick(); setInterval(tick, 1000);
+})();
+
+/* TOAST */
+let toastTimer = null;
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 2200);
+}
+
+/* UNIDADES */
+const UNIDADES = [
+  { id:'san-agustin', nombre:'San Agustín', color:'#2632F0', lugares:['Spot','Playa'] },
+  { id:'guadalupe',   nombre:'Guadalupe',   color:'#DD2FB5', lugares:['Shop','Playa'] },
+];
+
+/* ============================================================
+   FORMATEO DE NOMBRES — Título, no MAYÚSCULAS
+   ============================================================ */
+const PARTICLES = new Set(['de','del','la','las','los','y','e','da','das','do','dos','van','von']);
+
+function toTitleCase(str){
+  if (!str) return '';
+  const words = str.toString().trim().toLowerCase().split(/\s+/);
+  return words.map((w, i) => {
+    if (!w) return '';
+    if (i > 0 && PARTICLES.has(w)) return w;
+    /* Preservar tildes al capitalizar */
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  }).join(' ');
+}
+
+/* Mapa de correcciones: la clave debe estar en MAYÚSCULAS para lookup robusto */
+const NAME_FIX = {
+  'GILE STAFINI':       'Gile Stefani',
+  'OSCAR KELER':        'Oscar Keller',
+  'MG':                 'Max Galeano',
+  'ANABELA MANNARIO':   'Anabella Mannarino',
+  'ANABELLA MANNARINO': 'Anabella Mannarino',
+  'SOFIA DLMATA':       'Sofía de la Mata',
+  'SOFIA DE LA MATA':   'Sofía de la Mata',
+  'ELVIS RANI':         'Elvis Rangel'
+};
+
+function fixName(n){
+  if (!n) return '';
+  const raw = n.toString().trim();
+  if (!raw) return '';
+  const upper = raw.toUpperCase();
+  if (NAME_FIX[upper]) return NAME_FIX[upper];
+  return toTitleCase(raw);
+}
+
+/* Placeholders que no son personas reales */
+const PLACEHOLDERS = new Set(['AG','MA','MG (Medio Día)','2','3','1']);
+let COLOR_OVERRIDES = {};
+try {
+  const savedColors = localStorage.getItem('turnos_color_overrides');
+  if (savedColors) COLOR_OVERRIDES = JSON.parse(savedColors);
+} catch(_){}
+
+/* ============================================================
+   DATOS (con nombres normalizados en el mapa de corrección)
+   ============================================================ */
+const SPOT_FECHAS = [
+  "1-sep.","2-sep.","3-sep.","4-sep.","5-sep.","6-sep.","7-sep.","8-sep.","9-sep.","10-sep.",
+  "11-sep.","12-sep.","13-sep.","14-sep.","15-sep.","16-sep.","17-sep.","18-sep.","19-sep.","20-sep.",
+  "21-sep.","22-sep.","23-sep.","24-sep.","25-sep.","26-sep.","27-sep.","28-sep.","29-sep.","30-sep.",
+  "1-oct.","2-oct.","3-oct.","4-oct.","5-oct.","6-oct.","7-oct.","8-oct.","9-oct.","10-oct.",
+  "11-oct.","12-oct.","13-oct.","14-oct.","15-oct.","16-oct.","17-oct.","18-oct.","19-oct.","20-oct.",
+  "21-oct.","22-oct.","23-oct.","24-oct.","25-oct.","26-oct.","27-oct.","28-oct.","29-oct.","30-oct.",
+  "31-oct.","1-nov.","2-nov.","3-nov.","4-nov.","5-nov.","6-nov.","7-nov.","8-nov.","9-nov.",
+  "10-nov.","11-nov.","12-nov.","13-nov.","14-nov.","15-nov.","16-nov.","17-nov.","18-nov.","19-nov.",
+  "20-nov.","21-nov.","22-nov.","23-nov.","24-nov.","25-nov.","26-nov.","27-nov.","28-nov.","29-nov.",
+  "30-nov.","1-dic.","2-dic.","3-dic.","4-dic.","5-dic.","6-dic.","7-dic.","8-dic.","9-dic.",
+  "10-dic.","11-dic.","12-dic.","13-dic.","14-dic.","15-dic.","16-dic.","17-dic.","18-dic.","19-dic.",
+  "20-dic.","21-dic.","22-dic.","23-dic.","24-dic.","25-dic.","26-dic.","27-dic.","28-dic.","29-dic.",
+  "30-dic.","31-dic.","1-ene."
+];
+const SPOT_MES_MAP = { sep:9, oct:10, nov:11, dic:12, ene:1 };
+function spotMesDeFecha(f){ const m = f.match(/-(\w+)\.?$/); return m ? SPOT_MES_MAP[m[1]] : null; }
+function parseSpotDate(fStr){
+  const m = fStr.match(/^(\d+)-(\w+)\.?$/); if (!m) return null;
+  const dia = parseInt(m[1], 10); const mes = SPOT_MES_MAP[m[2]]; if (!mes) return null;
+  const year = (mes === 1) ? 2027 : 2026;
+  return new Date(year, mes - 1, dia);
+}
+const SPOT_TURNOS = [
+  { horario:"23:00 a 06:00", puesto:"NOCHE", valores:[
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Anneris Guerra","Sofia de Filippi","Sofia de Filippi",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Andrea Kummer","Andrea Kummer","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Gomez Maca","Gomez Maca",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Ursprung Camila","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Ursprung Camila","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Beltran Veronica","",""
+  ]},
+  { horario:"06:00 a 14:00", puesto:"CAJA", valores:[
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Ayelen Demaria","Ursprung Camila","Gomez Maca","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Ursprung Camila","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Gile Stafini",
+    "Gile Stafini","Ursprung Camila","Ursprung Camila","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Ursprung Camila","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Ursprung Camila","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Ayelen Demaria"
+  ]},
+  { horario:"06:00 a 14:00", puesto:"CAFETERA", valores:[
+    "Ursprung Camila","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Gomez Maca","Gile Stafini","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Gomez Maca","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Joana Fritzler","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Ayelen Demaria","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Gile Stafini","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Gile Stafini","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Gomez Maca","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Joana Fritzler","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Ayelen Demaria","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Andrea Kummer","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Gile Stafini","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Gomez Maca","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Joana Fritzler","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Ayelen Demaria","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Sofia de Filippi"
+  ]},
+  { horario:"08:00 a 16:00", puesto:"PS", valores:[
+    "Gomez Maca","","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca",
+    "","Beltran Veronica","Joana Fritzler","Joana Fritzler","Joana Fritzler","Gile Stafini","","Ursprung Camila",
+    "Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Anneris Guerra","Anneris Guerra","Anneris Guerra","Anneris Guerra","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Anneris Guerra","Anneris Guerra","Anneris Guerra","Gile Stafini","Anneris Guerra","Gile Stafini","Gile Stafini",
+    "Ursprung Camila","Ursprung Camila","Gile Stafini","Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca","Ursprung Camila",
+    "Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Gile Stafini","Gile Stafini","Gile Stafini","Gile Stafini","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Andrea Kummer","Andrea Kummer"
+  ]},
+  { horario:"10:00 a 18:00", puesto:"REFUERZO", valores:[
+    "","","","Gile Stafini","Gile Stafini","AG","","",
+    "Beltran Veronica","","Ursprung Camila/Beltran Veronica","Ursprung Camila",
+    "Ursprung Camila","Beltran Veronica","Beltran Veronica","",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Gile Stafini","Gile Stafini","Ursprung Camila","Ursprung Camila",
+    "Anneris Guerra","Gile Stafini","Gile Stafini","Ursprung Camila",
+    "Ursprung Camila","Gile Stafini","Ursprung Camila","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Ursprung Camila","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Gomez Maca",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Ursprung Camila","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra"
+  ]},
+  { horario:"14:00 a 22:00", puesto:"CAJA", valores:[
+    "Andrea Kummer","Joana Fritzler","Joana Fritzler","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Andrea Kummer","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","","","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Gile Stafini",
+    "Gile Stafini","Ursprung Camila","Gomez Maca","Gomez Maca",
+    "Gomez Maca","Ursprung Camila","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Gomez Maca","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Lucila Nieto","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Gile Stafini","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Ursprung Camila","Gomez Maca",
+    "Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Beltran Veronica","Joana Fritzler",
+    "Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Lucila Nieto","Ayelen Demaria",
+    "Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Sofia de Filippi","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Andrea Kummer","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Gile Stafini"
+  ]},
+  { horario:"14:00 a 22:00", puesto:"CAFETERIA", valores:[
+    "Gile Stafini","","Ursprung Camila","Ursprung Camila","Ursprung Camila","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Anneris Guerra","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca","Joana Fritzler","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Andrea Kummer","Andrea Kummer","Ursprung Camila","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Gomez Maca","Gomez Maca","Gile Stafini","Gile Stafini","Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Ursprung Camila","Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer","Gomez Maca","Andrea Kummer","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Joana Fritzler","Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Gile Stafini","Gile Stafini","Gile Stafini","Gile Stafini","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca","Gomez Maca","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Beltran Veronica","Joana Fritzler","Joana Fritzler","Joana Fritzler","Joana Fritzler","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Sofia de Filippi","Andrea Kummer","Andrea Kummer","Andrea Kummer","Andrea Kummer","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Anneris Guerra","Gile Stafini","Gile Stafini","Gile Stafini","Gile Stafini","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Ursprung Camila","Gomez Maca"
+  ]},
+  { horario:"15:15 a 23:00", puesto:"PS", valores:[
+    "Anneris Guerra","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Gile Stafini","Gile Stafini","Andrea Kummer","Andrea Kummer",
+    "Andrea Kummer","Andrea Kummer","Ayelen Demaria","Ayelen Demaria",
+    "Ayelen Demaria","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Andrea Kummer","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Joana Fritzler","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Gile Stafini","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca",
+    "Gomez Maca","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Joana Fritzler","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Ayelen Demaria","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Andrea Kummer","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Gile Stafini","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca",
+    "Gomez Maca","Beltran Veronica","Beltran Veronica","Beltran Veronica",
+    "Beltran Veronica","Joana Fritzler","Joana Fritzler","Joana Fritzler",
+    "Joana Fritzler","Lucila Nieto","Lucila Nieto","Lucila Nieto",
+    "Lucila Nieto","Ayelen Demaria","Ayelen Demaria","Ayelen Demaria",
+    "Ayelen Demaria","Sofia de Filippi","Sofia de Filippi","Sofia de Filippi",
+    "Sofia de Filippi","Andrea Kummer","Andrea Kummer","Andrea Kummer",
+    "Andrea Kummer","Anneris Guerra","Anneris Guerra","Anneris Guerra",
+    "Anneris Guerra","Gile Stafini","Gile Stafini","Gile Stafini",
+    "Gile Stafini","Ursprung Camila","Ursprung Camila","Ursprung Camila",
+    "Ursprung Camila","Gomez Maca","Gomez Maca","Gomez Maca",
+    "Gomez Maca","",""
+  ]}
+];
+
+/* ============================================================
+   PLANILLA PLAYA SA
+   ============================================================ */
+const PLAYA_CODES = {
+  LR:{ nombre:'Leonardo Requena' }, LB:{ nombre:'Leandro Bancho' },
+  LH:{ nombre:'Luis Heinen' },      NE:{ nombre:'Natalia Emmer' },
+  VM:{ nombre:'Victor Monzon' },    DB:{ nombre:'David Benitez' },
+  SR:{ nombre:'Sabrina Reible' },   OK:{ nombre:'Oscar Keller' },
+  AV:{ nombre:'Alejandro Volken' }
+};
+const PLAYA_ROWS = [
+  { turno:'T₁', horario:'23:00 a 06:00', code:'LR' },
+  { turno:'T₂', horario:'06:00 a 14:00', code:'LB' },
+  { turno:'T₂', horario:'06:00 a 14:00', code:'LH' },
+  { turno:'T₂', horario:'07:00 a 15:00', code:'NE' },
+  { turno:'T₂', horario:'07:00 a 15:00', code:'VM' },
+  { turno:'T₃', horario:'14:00 a 22:00', code:'DB' },
+  { turno:'T₃', horario:'14:00 a 22:00', code:'SR' },
+  { turno:'T₃', horario:'15:15 a 23:00', code:'OK' },
+  { turno:'T₃', horario:'15:15 a 23:00', code:'AV' }
+];
+function playaGetValue(code, idx){
+  switch(code){
+    case 'LR': if (idx<=33) return (idx%5===3)?'LH':'LR'; return ((idx-38)%5===0)?'LR':'AV';
+    case 'LB': if (idx<=32) return (idx%5===4)?'':'LB';   return ((idx-35)%5===0)?'':'DB';
+    case 'LH': if (idx<=31){const p=idx%5; return (p===2||p===3)?'':'LH';} return ((idx-35)%5>=3)?'':'LR';
+    case 'NE': if (idx<=32) return (idx>=5 && idx%5===0)?'':'NE'; return ((idx-36)%5===0)?'':'SR';
+    case 'VM': if (idx<=32) return (idx>=5 && idx%5===0)?'':'VM'; return ((idx-35)%5===0)?'':'LH';
+    case 'DB': if (idx<=32) return (idx>=5 && idx%5===0)?'':'DB'; return ((idx-34)%5===0)?'':'LB';
+    case 'SR': if (idx<=31) return (idx%5===2)?'':'SR';   return ((idx-38)%5===0)?'':'NE';
+    case 'OK': return (idx>=5 && idx%5===0)?'':'OK';
+    case 'AV': if (idx<=32) return (idx>=5 && idx%5===0)?'':'AV'; return ((idx-35)%5===0)?'':'VM';
+    default: return '';
+  }
+}
+
+/* Override Septiembre 2026 (según imagen) */
+const PLAYA_SEP_OVERRIDES = {
+  LR: ['LR','AV','AV','AV','AV','AV','AV','LR','AV','AV','AV','AV',
+       'LR','AV','AV','AV','AV','LR','AV','AV','AV','AV','LR','AV',
+       'AV','AV','AV','LR','AV','AV'],
+  LB: ['DB','DB','DB','','DB','DB','DB','DB','','DB','DB','DB','DB','',
+       'DB','DB','DB','DB','','DB','DB','DB','DB','','DB','DB','DB','DB','','DB','DB'],
+  LH: ['','','LR','LR','','','','LR','LR','','','','LR','LR','',
+       '','','LR','LR','','','','LR','LR','','','','LR','LR','',''],
+  NE: ['','SR','SR','SR','SR','SR','','SR','SR','SR','SR','SR','',
+       'SR','SR','SR','SR','SR','','SR','SR','SR','SR','SR','','SR','SR','SR','SR','SR'],
+  VM: ['LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH',
+       'LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH','LH'],
+  DB: ['LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB',
+       'LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB','LB'],
+  SR: ['','NE','NE','NE','NE','NE','','NE','NE','NE','NE','NE','',
+       'NE','NE','NE','NE','NE','','NE','NE','NE','NE','NE','','NE','NE','NE','NE','NE'],
+  OK: ['OK','OK','','OK','OK','OK','OK','OK','OK','','OK','OK','OK','OK','OK','OK','',
+       'OK','OK','OK','OK','OK','OK','','OK','OK','OK','OK','OK','OK'],
+  AV: ['VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM',
+       'VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM','VM']
+};
+
+/* ============================================================
+   SHOP GUADALUPE
+   ============================================================ */
+const SHOP_GUA_CODES = {
+  A:'Anabella Mannarino', B:'Valeria Bechi',
+  C:'Carolina Gomez', Y:'Yesica Gomez', S:'Sofía de la Mata'
+};
+function expandirShop(compacto){ return compacto.split('').map(ch => SHOP_GUA_CODES[ch] || ''); }
+const SHOP_FECHAS = [];
+(function(){
+  const meses = [
+    { y:2026, m:9,  dias:30 }, { y:2026, m:10, dias:31 },
+    { y:2026, m:11, dias:30 }, { y:2026, m:12, dias:31 }
+  ];
+  meses.forEach(mm => { for (let d=1; d<=mm.dias; d++) SHOP_FECHAS.push({ y:mm.y, m:mm.m, d }); });
+})();
+const SHOP_GUA_ROWS = [
+  { horario:'T-1: 06:00 a 14:30', tipo:'Mañana',
+    compacto:"AAABBBBYBYSSSSYYYBBBBBYYYCCCCCCABBBBBBBYYYYYYAAAAAASSSSSSYCCCAAAAAASSSSSSYCCCCCCABBBBBBYYYYYYAAAAAASSSSSSYCCCCCCABBBBBBYYY" },
+  { horario:'T-2: 14:30 a 23:00', tipo:'Tarde',
+    compacto:"SBCCCCCCSBYYYAAAAAASSSSSAAASSSSSSCCCCCCABBBBBBYYYYYYAAAAAASSBYYYYCCCCCCCAAAAAASSSSSSYCCCCCCABBBBBBBBBBYYYYYYAAAAAASSSSSSYCCCCCCABBBBBYYYYYYAAAAAASSSSSSYCCCCCCABBBBB" },
+  { horario:'Ayudante único 6 a 14:30', tipo:'Mañana',
+    compacto:"__YYYSSS__CCCCCC__YYYAAA__YYYAAA__YYYAAA__ASSSSS__CCCCCC__BBBBBY__YYY_CCC__BBBBBY__YYYAAA__ASSSSS__C_CCCCC__BBBBBY__YYYAAA__ASSSSS" },
+  { horario:'07:30 a 12:00 / 17:00 a 20:30', tipo:'Refuerzo',
+    compacto:"YY______AA______SB______SB______YAS______SA______SB_____YV______SB______YV______YA______SA______SB_____YV_____YA" },
+  { horario:'Ayudante único 15 a 23', tipo:'Tarde',
+    compacto:"__BSSAAA__BBBBBS__CCCBBB__BBBBY__YYYAAA__SSSSS__CCCCCC__BBB_SSS__CCC__BBB__YYYAAA__SSSSS_SSSS__BBB__YYYAAA_SSSSS__BBB" }
+];
+function normalizar(str, len){
+  str = (str || '').replace(/\s+/g,'');
+  if (str.length === len) return str;
+  if (str.length > len) return str.slice(0, len);
+  return str + '_'.repeat(len - str.length);
+}
+
+/* ============================================================
+   PLAYA GP
+   ============================================================ */
+const PLAYA_GP_CODES = { ER: 'Elvis Rangel', MG: 'Max Galeano' };
+const PLAYA_GP_ROWS = [
+  { horario:'23:00 - 06:00', tipo:'Noche', valores:[
+    "Mario Fernandez","ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez"
+  ]},
+  { horario:'06:00 - 14:00', tipo:'Mañana', valores:[
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez"
+  ]},
+  { horario:'07:00 - 15:00', tipo:'Mañana', valores:[
+    "Lucas Solver","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Mario Fernandez","Mario Fernandez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Mario Fernandez","Mario Fernandez",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "",
+    "Lautaro Monzon","Lautaro Monzon",
+    "ER","ER","ER","ER","ER","ER",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez"
+  ]},
+  { horario:'14:00 - 21:50', tipo:'Tarde', valores:[
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "ER","ER","ER","ER","ER","ER",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz","Nicolas Venetz",
+    "Lucas Solver",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez","Nazareno Martinez"
+  ]},
+  { horario:'15:15 - 23:00', tipo:'Tarde', valores:[
+    "Nazareno Martinez","Nazareno Martinez","Nazareno Martinez",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra","Nicolas Gamarra",
+    "Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver","Lucas Solver",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon",
+    "Lucas Solver","Lucas Solver",
+    "Lautaro Monzon","Lautaro Monzon",
+    "Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez","Mario Fernandez",
+    "ER","ER","ER","ER","ER","ER",
+    "Lucas Solver",
+    "Lautaro Monzon","Lautaro Monzon","Lautaro Monzon","Lautaro Monzon"
+  ]},
+  { horario:'08:00 - 12:00 / 16:00 - 20:00', tipo:'Medio Día', valores:[
+    "","","","","","Nicolas Gamarra","Nicolas Gamarra","","","","","","",
+    "Nicolas Gamarra","Nicolas Gamarra","","","","","","","","","","","","","",
+    "Nicolas Gamarra","Nicolas Gamarra","","","","","","","","","","","","","","",
+    "Nicolas Gamarra","Nicolas Gamarra","","","","","","","","","","","","","","",
+    "Nicolas Gamarra","Nicolas Gamarra","","","","","","","","","","","","","","",
+    "","","","","","","","",
+    "Nicolas Gamarra","Nicolas Gamarra","","","","","","","","",
+    "Lucas Solver","Lucas Solver","","","","","","",
+    "Lautaro Monzon","","","",
+    "Lucas Solver","Lucas Solver","","",
+    "Lucas Solver","","",
+    "Lucas Solver","","","","","","","","","","","","","","","","","",""
+  ]},
+  { horario:'🛻 Lun - Sáb medio día', tipo:'Medio Día', valores:[
+    "MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG","",
+    "MG","MG","MG","MG","MG","MG","","MG","MG","MG","MG","MG","MG"
+  ]}
+];
+
+/* OVERRIDES + NQ */
+let OVERRIDES = { spot:{}, playaSA:{}, shopGua:{}, playaGP:{} };
+let NQ_SCHEDULES = [];
+try {
+  const savedOv = localStorage.getItem('turnos_overrides');
+  if (savedOv) {
+    const parsed = JSON.parse(savedOv);
+    OVERRIDES = {
+      spot: parsed.spot || {},
+      playaSA: parsed.playaSA || {},
+      shopGua: parsed.shopGua || {},
+      playaGP: parsed.playaGP || {}
+    };
+  }
+  const savedNq = localStorage.getItem('turnos_nq');
+  if (savedNq) NQ_SCHEDULES = JSON.parse(savedNq);
+} catch(_){}
+
+function savePersisted(){
+  try {
+    localStorage.setItem('turnos_overrides', JSON.stringify(OVERRIDES));
+    localStorage.setItem('turnos_nq', JSON.stringify(NQ_SCHEDULES));
+    localStorage.setItem('turnos_color_overrides', JSON.stringify(COLOR_OVERRIDES));
+  } catch(e){
+    console.warn('No se pudo guardar en localStorage', e);
+  }
+}
+
+function applyOverride(tableId, row, col, original){
+  const key = row + '-' + col;
+  return (OVERRIDES[tableId][key] !== undefined) ? OVERRIDES[tableId][key] : original;
+}
+
+/* ============================================================
+   CONSTRUCCIÓN DE EMPLEADOS Y TURNOS
+   ============================================================ */
+const PALETA = [
+  '#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444',
+  '#06b6d4','#84cc16','#ec4899','#14b8a6','#f97316',
+  '#6366f1','#22c55e','#eab308','#a855f7','#f43f5e',
+  '#0ea5e9','#65a30d','#d946ef','#0d9488','#fb923c',
+  '#4f46e5','#16a34a','#ca8a04','#9333ea','#e11d48'
+];
+let EMPLEADOS = [], TURNOS = [], empMap = {}, colorIdx = 0;
+
+function slug(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+function addEmp(nombre, unidad, lugar, puesto){
+  if (!nombre) return null;
+  const fixed = fixName(nombre); if (!fixed) return null;
+  if (empMap[fixed]) return empMap[fixed];
+  const id = slug(fixed) + '-' + (EMPLEADOS.length);
+  const baseColor = PALETA[colorIdx++ % PALETA.length];
+  const color = COLOR_OVERRIDES[fixed] || baseColor;
+  EMPLEADOS.push({ id, nombre: fixed, unidad, lugar, puesto, color });
+  empMap[fixed] = id;
+  return id;
+}
+function addTurno(fecha, empId, tipo, inicio, fin, nota){
+  if (!empId) return;
+  TURNOS.push({ fecha, empleado: empId, tipo, inicio, fin, nota: nota || '' });
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+function fechaISO(y,m,d){ return `${y}-${pad2(m)}-${pad2(d)}`; }
+function horaHHMM(h, m){ return `${pad2(h)}:${pad2(m||0)}`; }
+
+function buildAll(){
+  EMPLEADOS = []; TURNOS = []; empMap = {}; colorIdx = 0;
+  buildSpot(); buildPlayaSA(); buildShopGua(); buildPlayaGP(); buildNQ();
+}
+
+function buildSpot(){
+  const MESES = { sep:9, oct:10, nov:11, dic:12, ene:1 };
+  for (let rIdx = 0; rIdx < SPOT_TURNOS.length; rIdx++){
+    const t = SPOT_TURNOS[rIdx];
+    const m = t.horario.match(/(\d{1,2}):?(\d{0,2})\s*a\s*(\d{1,2}):?(\d{0,2})/);
+    const ini = m ? horaHHMM(m[1], m[2]) : '';
+    const fin = m ? horaHHMM(m[3], m[4]) : '';
+    for (let i = 0; i < t.valores.length; i++){
+      const val = applyOverride('spot', rIdx, i, t.valores[i]);
+      if (!val || PLACEHOLDERS.has(val)) continue;
+      const fStr = SPOT_FECHAS[i]; if (!fStr) continue;
+      const fm = fStr.match(/^(\d+)-(\w+)\.?$/); if (!fm) continue;
+      const dia = parseInt(fm[1]); const mes = MESES[fm[2]];
+      const year = (mes === 1) ? 2027 : 2026;
+      const fIso = fechaISO(year, mes, dia);
+      val.split('/').map(s => s.trim()).filter(Boolean).forEach(nombre => {
+        const empId = addEmp(nombre, 'san-agustin', 'Spot', t.puesto);
+        addTurno(fIso, empId, t.puesto, ini, fin);
+      });
+    }
+  }
+}
+
+function buildPlayaSA(){
+  const ORIGIN = new Date(2026, 7, 1);
+  const START  = new Date(2026, 8, 1);
+  const END    = new Date(2026, 11, 31);
+  function gIdx(d){
+    const a = Date.UTC(ORIGIN.getFullYear(), ORIGIN.getMonth(), ORIGIN.getDate());
+    const b = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+    return Math.round((b - a) / 86400000);
+  }
+  let col = 0;
+  for (let d = new Date(START); d <= END; d.setDate(d.getDate() + 1)){
+    const g = gIdx(d);
+    const fIso = fechaISO(d.getFullYear(), d.getMonth() + 1, d.getDate());
+    const esSeptiembre = (d.getMonth() === 8 && d.getFullYear() === 2026);
+    const diaSep = d.getDate();
+    for (let rIdx = 0; rIdx < PLAYA_ROWS.length; rIdx++){
+      const row = PLAYA_ROWS[rIdx];
+      let val;
+      if (esSeptiembre && PLAYA_SEP_OVERRIDES[row.code]){
+        val = PLAYA_SEP_OVERRIDES[row.code][diaSep - 1];
+      } else {
+        val = playaGetValue(row.code, g);
+      }
+      val = applyOverride('playaSA', rIdx, col, val);
+      if (!val) continue;
+      const m = row.horario.match(/(\d{1,2}):?(\d{0,2})\s*a\s*(\d{1,2}):?(\d{0,2})/);
+      const ini = m ? horaHHMM(m[1], m[2]) : '';
+      const fin = m ? horaHHMM(m[3], m[4]) : '';
+      const nombre = PLAYA_CODES[val] ? PLAYA_CODES[val].nombre : val;
+      const empId = addEmp(nombre, 'san-agustin', 'Playa', row.turno);
+      addTurno(fIso, empId, row.turno, ini, fin);
+    }
+    col++;
+  }
+}
+
+function buildShopGua(){
+  for (let rIdx = 0; rIdx < SHOP_GUA_ROWS.length; rIdx++){
+    const row = SHOP_GUA_ROWS[rIdx];
+    const expanded = expandirShop(normalizar(row.compacto, SHOP_FECHAS.length));
+    const m = row.horario.match(/(\d{1,2})[:.](\d{2})\s*(?:a|-)\s*(\d{1,2})[:.](\d{2})/);
+    const ini = m ? horaHHMM(m[1], m[2]) : '';
+    const fin = m ? horaHHMM(m[3], m[4]) : '';
+    for (let i = 0; i < SHOP_FECHAS.length; i++){
+      const val = applyOverride('shopGua', rIdx, i, expanded[i]);
+      if (!val) continue;
+      const f = SHOP_FECHAS[i];
+      const fIso = fechaISO(f.y, f.m, f.d);
+      const empId = addEmp(val, 'guadalupe', 'Shop', row.tipo);
+      addTurno(fIso, empId, row.tipo, ini, fin);
+    }
+  }
+}
+
+function buildPlayaGP(){
+  const fechas = [];
+  for (let m of [9,10,11]){
+    const ultimo = (m === 9 || m === 11) ? 30 : 31;
+    for (let d = 1; d <= ultimo; d++) fechas.push({ y:2026, m, d });
+  }
+  fechas.push({ y:2026, m:12, d:1 });
+  function resolver(nombre){ return PLAYA_GP_CODES[nombre] || nombre; }
+  function parseHorario(h){
+    const m = h.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+    if (!m) return { ini:'', fin:'' };
+    return { ini: horaHHMM(m[1], m[2]), fin: horaHHMM(m[3], m[4]) };
+  }
+  for (let rIdx = 0; rIdx < PLAYA_GP_ROWS.length; rIdx++){
+    const row = PLAYA_GP_ROWS[rIdx];
+    const { ini, fin } = parseHorario(row.horario);
+    for (let i = 0; i < row.valores.length && i < fechas.length; i++){
+      const val = applyOverride('playaGP', rIdx, i, row.valores[i]);
+      if (!val || PLACEHOLDERS.has(val)) continue;
+      const nombre = resolver(val);
+      const f = fechas[i]; const fIso = fechaISO(f.y, f.m, f.d);
+      const empId = addEmp(nombre, 'guadalupe', 'Playa', row.tipo);
+      addTurno(fIso, empId, row.tipo, ini, fin);
+    }
+  }
+}
+
+function buildNQ(){
+  for (const s of NQ_SCHEDULES){
+    const empId = addEmp(s.nombre, s.unidad, s.lugar, s.tipo || 'Turno');
+    addTurno(s.fecha, empId, s.tipo || 'Turno', s.inicio, s.fin, s.nota);
+  }
+}
+
+buildAll();
+
+/* HELPERS */
+const DIAS  = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const DIASC = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MESES_C = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const pad = n => String(n).padStart(2,'0');
+const isoD = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseISO = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const iniciales = n => n.split(/\s+/).slice(0,2).map(p => p[0]||'').join('').toUpperCase();
+const fechaLarga = d => `${DIAS[d.getDay()]}, ${d.getDate()} de ${MESES[d.getMonth()]}`;
+const mismoDia = (a,b) => isoD(a) === isoD(b);
+const inicioSemana = d => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay()+6)%7)); x.setHours(0,0,0,0); return x; };
+
+let empById = Object.fromEntries(EMPLEADOS.map(e => [e.id, e]));
+let empByNombre = Object.fromEntries(EMPLEADOS.map(e => [e.nombre, e]));
+const uniById = Object.fromEntries(UNIDADES.map(u => [u.id, u]));
+
+function lighten(hex, amount = 0.85){
+  if (!hex || hex[0] !== '#') return '#1a1a1a';
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  // Dark mode: mix toward dark instead of white
+  const nr = Math.round(r * (1 - amount * 0.7));
+  const ng = Math.round(g * (1 - amount * 0.7));
+  const nb = Math.round(b * (1 - amount * 0.7));
+  return `rgb(${Math.max(nr,20)},${Math.max(ng,20)},${Math.max(nb,20)})`;
+}
+
+function cellInfo(val){
+  if (!val || PLACEHOLDERS.has(val)) return { style:'', html:'·', cls:'cell-empty' };
+  const first = val.split('/')[0].trim();
+  const fixedFirst = fixName(first);
+  const emp = empByNombre[fixedFirst];
+  if (!emp) return { style:'', html: esc(fixName(val)), cls:'cell-v' };
+  return {
+    style: `background:${lighten(emp.color,0.72)};color:${emp.color}`,
+    html: esc(val.split('/').map(n => fixName(n)).join(' / ')),
+    cls: 'cell-v'
+  };
+}
+
+/* DESCANSANDO */
+function personasDescansando(fechaActual){
+  const fIso = isoD(fechaActual);
+  const fMs  = fechaActual.getTime();
+  const VENTANA = 7 * 24 * 60 * 60 * 1000;
+  const out = [];
+  for (const emp of EMPLEADOS){
+    if (filtroUnidad && emp.unidad !== filtroUnidad) continue;
+    const trabajaHoy = TURNOS.some(t => t.fecha === fIso && t.empleado === emp.id);
+    if (trabajaHoy) continue;
+    const activo = TURNOS.some(t => {
+      if (t.empleado !== emp.id) return false;
+      const tMs = parseISO(t.fecha).getTime();
+      return Math.abs(tMs - fMs) <= VENTANA;
+    });
+    if (activo) out.push(emp);
+  }
+  out.sort((a, b) => {
+    if (a.unidad !== b.unidad) return a.unidad.localeCompare(b.unidad);
+    if (a.lugar  !== b.lugar)  return a.lugar.localeCompare(b.lugar);
+    return a.nombre.localeCompare(b.nombre);
+  });
+  return out;
+}
+function renderDescansando(fechaActual){
+  const personas = personasDescansando(fechaActual);
+  if (!personas.length) return '';
+  const items = personas.map(e => `
+    <div class="descanso-item">
+      <div class="descanso-av" style="--c:${e.color}">${esc(iniciales(e.nombre))}</div>
+      <div class="descanso-info">
+        <div class="descanso-name">${esc(e.nombre)}</div>
+        <div class="descanso-lugar">${esc(e.lugar)} · ${esc(uniById[e.unidad] ? uniById[e.unidad].nombre : e.unidad)}</div>
+      </div>
+    </div>`).join('');
+  return `<section class="descanso-bloque">
+    <header class="descanso-head">
+      <span class="descanso-title"><span class="ico">🌙</span> Descansando hoy</span>
+      <span class="descanso-count">${personas.length}</span>
+    </header>
+    <div class="descanso-grid">${items}</div>
+  </section>`;
+}
+
+/* FILTRO MES */
+let filtroMes = (new Date().getMonth() + 1); // mes actual por defecto
+function debeMostrarMes(mesNum){ if (filtroMes === null) return true; return mesNum === filtroMes; }
+function renderMesChips(){
+  const meses = [
+    { v: null, label: 'Todos' }, { v: 9, label: 'Sep' }, { v: 10, label: 'Oct' },
+    { v: 11, label: 'Nov' }, { v: 12, label: 'Dic' }
+  ];
+  return `<div class="mes-chips">
+    <span class="mes-label">Mes:</span>
+    ${meses.map(m => `<button class="mchip ${filtroMes === m.v ? 'on' : ''}" data-mes="${m.v === null ? '' : m.v}">${m.label}</button>`).join('')}
+  </div>`;
+}
+
+/* EDIT TOOLS */
+let srchState = { find: '', replace: '', date: '2026-09-01' };
+function renderEditTools(){
+  const unidadFiltro = (vista === 'gp') ? 'guadalupe' : 'san-agustin';
+  const relevantEmps = EMPLEADOS.filter(e => e.unidad === unidadFiltro);
+  return `<div class="edit-tools">
+    <div class="edit-section">
+      <div class="edit-section-title">
+        🔍 Buscar y reemplazar desde una fecha
+        <span class="hint-mini">reemplaza de la fecha elegida en adelante</span>
+      </div>
+      <div class="edit-tools-row">
+        <input type="text" id="srchFind" class="edit-input" list="srchNames"
+          placeholder="Nombre a buscar (ej: Gile Stefani)" value="${esc(srchState.find)}" />
+        <datalist id="srchNames">
+          ${relevantEmps.map(e => `<option value="${esc(e.nombre)}"></option>`).join('')}
+        </datalist>
+        <input type="text" id="srchReplace" class="edit-input"
+          placeholder="Reemplazar con (ej: Gile Stefani)" value="${esc(srchState.replace)}" />
+      </div>
+      <div class="edit-tools-row">
+        <label class="edit-date-label">
+          Desde:
+          <input type="date" id="srchDate" class="edit-input" value="${srchState.date}" />
+        </label>
+        <button type="button" id="srchApply" class="edit-btn-apply">Aplicar reemplazo</button>
+      </div>
+    </div>
+    <div class="edit-section">
+      <div class="edit-section-title">🎨 Colores de colaboradores</div>
+      <div class="edit-colors" id="editColors">
+        ${relevantEmps.map(e => {
+          const isOv = COLOR_OVERRIDES[e.nombre] !== undefined;
+          return `<label class="edit-color-item">
+            <input type="color" value="${isOv ? COLOR_OVERRIDES[e.nombre] : e.color}" data-color-name="${esc(e.nombre)}" />
+            <span>${esc(e.nombre)}</span>
+            ${isOv ? `<button type="button" class="reset" data-color-reset="${esc(e.nombre)}" title="Restablecer">↺</button>` : ''}
+          </label>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function replaceInValue(val, find, replace){
+  if (!val) return val;
+  const findUpper = find.trim().toUpperCase();
+  if (val.trim().toUpperCase() === findUpper) return replace;
+  if (val.includes('/') || val.includes(',')){
+    const parts = val.split(/([\/,])/);
+    let changed = false;
+    const newParts = parts.map(p => {
+      if (p === '/' || p === ',') return p;
+      const t = p.trim();
+      if (t.toUpperCase() === findUpper){ changed = true; return p.replace(t, replace); }
+      return p;
+    });
+    return changed ? newParts.join('') : val;
+  }
+  return val;
+}
+
+function applySearchReplace(){
+  const findEl = document.getElementById('srchFind');
+  const replaceEl = document.getElementById('srchReplace');
+  const dateEl = document.getElementById('srchDate');
+  if (!findEl || !replaceEl || !dateEl) return;
+  const find = findEl.value.trim();
+  const replace = replaceEl.value.trim();
+  const dateStr = dateEl.value;
+  if (!find){ showToast('Ingresá un nombre a buscar', 'err'); return; }
+  if (!replace){ showToast('Ingresá el nombre de reemplazo', 'err'); return; }
+  if (!dateStr){ showToast('Elegí una fecha desde', 'err'); return; }
+  let count = 0;
+
+  for (let r = 0; r < SPOT_TURNOS.length; r++){
+    for (let c = 0; c < SPOT_FECHAS.length; c++){
+      const fecha = parseSpotDate(SPOT_FECHAS[c]); if (!fecha) continue;
+      if (isoD(fecha) < dateStr) continue;
+      const key = `${r}-${c}`;
+      const curVal = OVERRIDES.spot[key] !== undefined ? OVERRIDES.spot[key] : (SPOT_TURNOS[r].valores[c] || '');
+      const newVal = replaceInValue(curVal, find, replace);
+      if (newVal !== curVal){ OVERRIDES.spot[key] = newVal; count++; }
+    }
+  }
+
+  {
+    const dates = []; const start = new Date(2026, 8, 1); const end = new Date(2026, 11, 31);
+    const d = new Date(start); while (d <= end){ dates.push(new Date(d)); d.setDate(d.getDate()+1); }
+    const ORIGIN = new Date(2026, 7, 1);
+    function gIdx(date){
+      const a = Date.UTC(ORIGIN.getFullYear(), ORIGIN.getMonth(), ORIGIN.getDate());
+      const b = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+      return Math.round((b - a) / 86400000);
+    }
+    for (let rIdx = 0; rIdx < PLAYA_ROWS.length; rIdx++){
+      const row = PLAYA_ROWS[rIdx];
+      for (let c = 0; c < dates.length; c++){
+        if (isoD(dates[c]) < dateStr) continue;
+        let origVal;
+        if (dates[c].getMonth() === 8 && PLAYA_SEP_OVERRIDES[row.code]){
+          origVal = PLAYA_SEP_OVERRIDES[row.code][dates[c].getDate() - 1];
+        } else {
+          origVal = playaGetValue(row.code, gIdx(dates[c]));
+        }
+        const origNombre = origVal ? (PLAYA_CODES[origVal] ? PLAYA_CODES[origVal].nombre : origVal) : '';
+        const key = `${rIdx}-${c}`;
+        const curVal = OVERRIDES.playaSA[key] !== undefined ? OVERRIDES.playaSA[key] : origNombre;
+        const newVal = replaceInValue(curVal, find, replace);
+        if (newVal !== curVal){ OVERRIDES.playaSA[key] = newVal; count++; }
+      }
+    }
+  }
+
+  for (let rIdx = 0; rIdx < SHOP_GUA_ROWS.length; rIdx++){
+    const row = SHOP_GUA_ROWS[rIdx];
+    const expanded = expandirShop(normalizar(row.compacto, SHOP_FECHAS.length));
+    for (let i = 0; i < SHOP_FECHAS.length; i++){
+      const f = SHOP_FECHAS[i]; const fIso = fechaISO(f.y, f.m, f.d);
+      if (fIso < dateStr) continue;
+      const key = `${rIdx}-${i}`;
+      const curVal = OVERRIDES.shopGua[key] !== undefined ? OVERRIDES.shopGua[key] : (expanded[i] || '');
+      const newVal = replaceInValue(curVal, find, replace);
+      if (newVal !== curVal){ OVERRIDES.shopGua[key] = newVal; count++; }
+    }
+  }
+
+  {
+    const fechas = [];
+    for (let m of [9,10,11]){
+      const ultimo = (m === 9 || m === 11) ? 30 : 31;
+      for (let d = 1; d <= ultimo; d++) fechas.push({ y:2026, m, d });
+    }
+    fechas.push({ y:2026, m:12, d:1 });
+    for (let rIdx = 0; rIdx < PLAYA_GP_ROWS.length; rIdx++){
+      const row = PLAYA_GP_ROWS[rIdx];
+      for (let i = 0; i < row.valores.length && i < fechas.length; i++){
+        const f = fechas[i]; const fIso = fechaISO(f.y, f.m, f.d);
+        if (fIso < dateStr) continue;
+        const origRaw = row.valores[i] || '';
+        const origNombre = origRaw ? (PLAYA_GP_CODES[origRaw] || origRaw) : '';
+        const key = `${rIdx}-${i}`;
+        const curVal = OVERRIDES.playaGP[key] !== undefined ? OVERRIDES.playaGP[key] : origNombre;
+        const newVal = replaceInValue(curVal, find, replace);
+        if (newVal !== curVal){ OVERRIDES.playaGP[key] = newVal; count++; }
+      }
+    }
+  }
+
+  savePersisted();
+  buildAll(); render();
+  if (count === 0){ showToast('No se encontraron coincidencias', 'err'); }
+  else { showToast(`✓ ${count} celda${count === 1 ? '' : 's'} actualizada${count === 1 ? '' : 's'}`, 'ok'); }
+}
+
+/* TABLAS */
+function editableAttr(tableId, rIdx, cIdx){
+  if (!editMode) return '';
+  return ` contenteditable="true" data-table="${tableId}" data-row="${rIdx}" data-col="${cIdx}" spellcheck="false"`;
+}
+
+function buildSpotSATable(){
+  const visibles = [];
+  for (let i = 0; i < SPOT_FECHAS.length; i++){
+    const mesNum = spotMesDeFecha(SPOT_FECHAS[i]);
+    if (debeMostrarMes(mesNum)) visibles.push(i);
+  }
+  let html = '<table class="shift-grid"><thead><tr>';
+  html += '<th class="sticky-col">Puesto</th>';
+  let mesAnt = null;
+  for (const i of visibles){
+    const mesNum = spotMesDeFecha(SPOT_FECHAS[i]);
+    const esInicio = mesNum !== mesAnt; mesAnt = mesNum;
+    const cls = esInicio ? ' class="month-start"' : '';
+    html += `<th${cls}>${SPOT_FECHAS[i]}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+  for (let rIdx = 0; rIdx < SPOT_TURNOS.length; rIdx++){
+    const t = SPOT_TURNOS[rIdx];
+    html += '<tr>';
+    html += `<td class="sticky-col">${esc(t.puesto)}<span class="sc-sub">${esc(t.horario)}</span></td>`;
+    for (const i of visibles){
+      const val = applyOverride('spot', rIdx, i, t.valores[i] || '');
+      const c = cellInfo(val);
+      const ea = editableAttr('spot', rIdx, i);
+      const styleAttr = editMode ? '' : ` style="${c.style}"`;
+      const cls = editMode ? 'cell-v' : c.cls;
+      html += `<td class="${cls}"${styleAttr}${ea}>${esc(c.html)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildPlayaSATable(){
+  const dates = [];
+  const start = new Date(2026, 8, 1); const end = new Date(2026, 11, 31);
+  const d = new Date(start); while (d <= end){ dates.push(new Date(d)); d.setDate(d.getDate()+1); }
+  const ORIGIN = new Date(2026, 7, 1);
+  function gIdx(date){
+    const a = Date.UTC(ORIGIN.getFullYear(), ORIGIN.getMonth(), ORIGIN.getDate());
+    const b = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    return Math.round((b - a) / 86400000);
+  }
+  const visibles = [];
+  for (let i = 0; i < dates.length; i++){
+    if (debeMostrarMes(dates[i].getMonth() + 1)) visibles.push(i);
+  }
+  let html = '<table class="shift-grid"><thead><tr>';
+  html += '<th class="sticky-col">Turno</th>';
+  let mesAnt = -1;
+  for (const i of visibles){
+    const f = dates[i]; const m = f.getMonth();
+    const firstOfMonth = (m !== mesAnt); mesAnt = m;
+    const label = firstOfMonth ? `${f.getDate()} ${MESES_C[m]}` : String(f.getDate());
+    const cls = firstOfMonth ? ' class="month-start"' : '';
+    html += `<th${cls}>${label}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+  for (let rIdx = 0; rIdx < PLAYA_ROWS.length; rIdx++){
+    const row = PLAYA_ROWS[rIdx];
+    html += '<tr>';
+    html += `<td class="sticky-col">${esc(row.turno)}<span class="sc-sub">${esc(row.horario)}</span></td>`;
+    for (const i of visibles){
+      const f = dates[i];
+      let val;
+      if (f.getMonth() === 8 && PLAYA_SEP_OVERRIDES[row.code]){
+        val = PLAYA_SEP_OVERRIDES[row.code][f.getDate() - 1];
+      } else {
+        val = playaGetValue(row.code, gIdx(f));
+      }
+      val = applyOverride('playaSA', rIdx, i, val);
+      const nombre = val ? (PLAYA_CODES[val] ? PLAYA_CODES[val].nombre : val) : '';
+      const c = cellInfo(nombre);
+      const ea = editableAttr('playaSA', rIdx, i);
+      const styleAttr = editMode ? '' : ` style="${c.style}"`;
+      const cls = editMode ? 'cell-v' : c.cls;
+      html += `<td class="${cls}"${styleAttr}${ea}>${esc(c.html)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildShopGuaTable(){
+  const visibles = [];
+  for (let i = 0; i < SHOP_FECHAS.length; i++){
+    if (debeMostrarMes(SHOP_FECHAS[i].m)) visibles.push(i);
+  }
+  let html = '<table class="shift-grid"><thead><tr>';
+  html += '<th class="sticky-col">Turno</th>';
+  let mesAnt = -1;
+  for (const i of visibles){
+    const f = SHOP_FECHAS[i];
+    const firstOfMonth = (f.m !== mesAnt); mesAnt = f.m;
+    const label = firstOfMonth ? `${f.d} ${MESES_C[f.m-1]}` : String(f.d);
+    const cls = firstOfMonth ? ' class="month-start"' : '';
+    html += `<th${cls}>${label}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+  for (let rIdx = 0; rIdx < SHOP_GUA_ROWS.length; rIdx++){
+    const row = SHOP_GUA_ROWS[rIdx];
+    const expanded = expandirShop(normalizar(row.compacto, SHOP_FECHAS.length));
+    html += '<tr>';
+    html += `<td class="sticky-col">${esc(row.horario)}<span class="sc-sub">${esc(row.tipo)}</span></td>`;
+    for (const i of visibles){
+      const val = applyOverride('shopGua', rIdx, i, expanded[i]);
+      const c = cellInfo(val);
+      const ea = editableAttr('shopGua', rIdx, i);
+      const styleAttr = editMode ? '' : ` style="${c.style}"`;
+      const cls = editMode ? 'cell-v' : c.cls;
+      html += `<td class="${cls}"${styleAttr}${ea}>${esc(c.html)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildPlayaGPTable(){
+  const fechas = [];
+  for (let m of [9,10,11]){
+    const ultimo = (m === 9 || m === 11) ? 30 : 31;
+    for (let d = 1; d <= ultimo; d++) fechas.push({ y:2026, m, d });
+  }
+  fechas.push({ y:2026, m:12, d:1 });
+  const visibles = [];
+  for (let i = 0; i < fechas.length; i++){
+    if (debeMostrarMes(fechas[i].m)) visibles.push(i);
+  }
+  let html = '<table class="shift-grid"><thead><tr>';
+  html += '<th class="sticky-col">Horario</th>';
+  let mesAnt = -1;
+  for (const i of visibles){
+    const f = fechas[i];
+    const firstOfMonth = (f.m !== mesAnt); mesAnt = f.m;
+    const label = firstOfMonth ? `${f.d} ${MESES_C[f.m-1]}` : String(f.d);
+    const cls = firstOfMonth ? ' class="month-start"' : '';
+    html += `<th${cls}>${label}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+  for (let rIdx = 0; rIdx < PLAYA_GP_ROWS.length; rIdx++){
+    const row = PLAYA_GP_ROWS[rIdx];
+    html += '<tr>';
+    html += `<td class="sticky-col">${esc(row.horario)}<span class="sc-sub">${esc(row.tipo)}</span></td>`;
+    for (const i of visibles){
+      const raw = applyOverride('playaGP', rIdx, i, row.valores[i] || '');
+      const nombre = raw ? (PLAYA_GP_CODES[raw] || raw) : '';
+      const c = cellInfo(nombre);
+      const ea = editableAttr('playaGP', rIdx, i);
+      const styleAttr = editMode ? '' : ` style="${c.style}"`;
+      const cls = editMode ? 'cell-v' : c.cls;
+      html += `<td class="${cls}"${styleAttr}${ea}>${esc(c.html)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderSA(){
+  const tools = editMode ? renderEditTools() : '';
+  return tools + `
+    <div class="tabla-wrap" style="--tc:#2632F0">
+      <div class="tabla-head">Spot San Agustín <span class="tc-sub">Sep 2026 – Ene 2027</span></div>
+      <div class="tabla-scroll">${buildSpotSATable()}</div>
+    </div>
+    <div class="tabla-wrap" style="--tc:#2632F0">
+      <div class="tabla-head">Playa San Agustín <span class="tc-sub">Sep – Dic 2026</span></div>
+      <div class="tabla-scroll">${buildPlayaSATable()}</div>
+    </div>
+  `;
+}
+
+function renderGP(){
+  const tools = editMode ? renderEditTools() : '';
+  return tools + `
+    <div class="tabla-wrap" style="--tc:#DD2FB5">
+      <div class="tabla-head">Shop Guadalupe <span class="tc-sub">Sep – Dic 2026</span></div>
+      <div class="tabla-scroll">${buildShopGuaTable()}</div>
+    </div>
+    <div class="tabla-wrap" style="--tc:#DD2FB5">
+      <div class="tabla-head">Playa Guadalupe <span class="tc-sub">Sep – Dic 2026</span></div>
+      <div class="tabla-scroll">${buildPlayaGPTable()}</div>
+    </div>
+  `;
+}
+
+function renderNQ(){
+  const listHtml = NQ_SCHEDULES.length
+    ? NQ_SCHEDULES.map((s, i) => `
+        <div class="nq-item">
+          <div class="nq-item-info">
+            <div class="nq-item-name">${esc(s.nombre)}</div>
+            <div class="nq-item-meta">
+              📅 ${esc(s.fecha)} · ⏰ ${esc(s.inicio)}–${esc(s.fin)} · ${esc(uniById[s.unidad] ? uniById[s.unidad].nombre : s.unidad)} · ${esc(s.lugar)}${s.nota ? ' · ' + esc(s.nota) : ''}
+            </div>
+          </div>
+          <button class="nq-item-del" data-nq-del="${i}">Eliminar</button>
+        </div>`).join('')
+    : `<div class="vacio-mini" style="padding:18px;text-align:center">Sin horarios agregados todavía</div>`;
+  return `
+    <div class="nq-wrap">
+      <div class="nq-head">Agregar nuevo horario</div>
+      <div class="nq-body">
+        <form id="nqForm">
+          <div class="nq-row single"><div class="nq-field">
+            <label for="nq-nombre">Nombre y apellido</label>
+            <input id="nq-nombre" type="text" placeholder="Ej: Juan Pérez" required></div></div>
+          <div class="nq-row">
+            <div class="nq-field"><label for="nq-fecha">Fecha</label>
+              <input id="nq-fecha" type="date" required></div>
+            <div class="nq-field"><label for="nq-tipo">Tipo de turno</label>
+              <input id="nq-tipo" type="text" placeholder="Ej: Mañana" required></div>
+          </div>
+          <div class="nq-row">
+            <div class="nq-field"><label for="nq-ini">Hora inicio</label>
+              <input id="nq-ini" type="time" required></div>
+            <div class="nq-field"><label for="nq-fin">Hora fin</label>
+              <input id="nq-fin" type="time" required></div>
+          </div>
+          <div class="nq-row">
+            <div class="nq-field"><label for="nq-unidad">Unidad</label>
+              <select id="nq-unidad">
+                <option value="san-agustin">San Agustín</option>
+                <option value="guadalupe">Guadalupe</option>
+              </select></div>
+            <div class="nq-field"><label for="nq-lugar">Lugar</label>
+              <input id="nq-lugar" type="text" placeholder="Ej: Playa" required></div>
+          </div>
+          <div class="nq-row single"><div class="nq-field">
+            <label for="nq-nota">Nota (opcional)</label>
+            <input id="nq-nota" type="text" placeholder="Ej: Cubre a Lucila"></div></div>
+          <div class="nq-actions">
+            <button type="button" class="btn-nq-clear" id="nqClear">Limpiar</button>
+            <button type="submit" class="btn-nq-add">Agregar horario</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="nq-list">
+      <div class="nq-list-head">
+        <span>Horarios agregados</span>
+        <span class="cnt">${NQ_SCHEDULES.length}</span>
+      </div>
+      ${listHtml}
+    </div>
+  `;
+}
+
+/* ESTADO Y RENDER */
+let vista = 'hoy';
+let fecha = new Date(2026, 8, 1);
+let filtroUnidad = null;
+let editMode = false;
+const EDIT_PASSWORD = 'zazu2026';
+
+function turnosDe(fechaIso){
+  return TURNOS.filter(t => t.fecha === fechaIso).filter(t => {
+    const e = empById[t.empleado]; if (!e) return false;
+    if (filtroUnidad && e.unidad !== filtroUnidad) return false;
+    return true;
+  }).sort((a,b) => (a.inicio||'').localeCompare(b.inicio||''));
+}
+
+const $titulo = document.getElementById('titulo');
+const $chipsUnidad = document.getElementById('chipsUnidad');
+const $vista = document.getElementById('vista');
+const $tabs = document.getElementById('tabs');
+const $btnEdit = document.getElementById('btnEdit');
+const $main = document.querySelector('main');
+
+function tituloActual(){
+  if (vista === 'hoy') return 'Hoy · ' + cap(fechaLarga(new Date()));
+  if (vista === 'sa') return 'San Agustín · Planillas';
+  if (vista === 'gp') return 'Guadalupe · Planillas';
+  if (vista === 'nq') return 'Agregar horarios · NQ';
+  if (vista === 'dia') return cap(fechaLarga(fecha));
+  if (vista === 'semana'){
+    const a = inicioSemana(fecha), b = new Date(a); b.setDate(b.getDate()+6);
+    if (a.getMonth() === b.getMonth())
+      return `${a.getDate()} – ${b.getDate()} de ${MESES[a.getMonth()]} ${a.getFullYear()}`;
+    return `${a.getDate()} ${MESES[a.getMonth()]} – ${b.getDate()} ${MESES[b.getMonth()]}`;
+  }
+  return cap(`${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`);
+}
+
+function cardTurno(t, compacto){
+  const e = empById[t.empleado] || { nombre: t.empleado, color:'#94a3b8' };
+  const hora = t.inicio && t.fin ? `${t.inicio} – ${t.fin}` : '—';
+  const badge = compacto ? (e.lugar || '') : (t.tipo || 'Turno');
+  const sub   = compacto ? (t.tipo || '') : (t.nota || '');
+  return `<article class="turno" style="--c:${e.color}">
+    <div class="avatar">${esc(iniciales(e.nombre))}</div>
+    <div class="cuerpo">
+      <div class="fila1"><span class="nombre">${esc(e.nombre)}</span><span class="badge">${esc(badge)}</span></div>
+      <div class="fila2"><span class="hora">${esc(hora)}</span>
+        ${sub ? `<span class="sep">·</span><span>${esc(sub)}</span>` : ''}</div>
+    </div>
+  </article>`;
+}
+
+function renderDia(){
+  const lista = turnosDe(isoD(fecha));
+  let html = `<div>
+      <div class="fecha-grande">${cap(fechaLarga(fecha))}</div>
+      <div class="sub">${lista.length} turno${lista.length === 1 ? '' : 's'}</div>
+    </div>`;
+  if (!lista.length){ html += `<div class="vacio">Sin turnos este día</div>`; }
+  else {
+    const visibles = UNIDADES.filter(u => !filtroUnidad || u.id === filtroUnidad);
+    for (const u of visibles){
+      const deUnidad = lista.filter(t => (empById[t.empleado]||{}).unidad === u.id);
+      if (!deUnidad.length) continue;
+      let lugaresHtml = '';
+      const lugares = [...new Set(deUnidad.map(t => (empById[t.empleado]||{}).lugar).filter(Boolean))];
+      for (const lugar of lugares){
+        const deLugar = deUnidad.filter(t => (empById[t.empleado]||{}).lugar === lugar);
+        lugaresHtml += `<div class="lugar-head">${esc(lugar)}</div>` + deLugar.map(t => cardTurno(t,false)).join('');
+      }
+      html += `<section class="unidad-bloque" style="--uc:${u.color}">
+        <header class="unidad-head">
+          <span class="unidad-name">${esc(u.nombre)}</span>
+          <span class="unidad-count">${deUnidad.length}</span>
+        </header>${lugaresHtml}
+      </section>`;
+    }
+  }
+  html += renderDescansando(fecha);
+  return html;
+}
+
+function renderSemana(){
+  const ini = inicioSemana(fecha);
+  let html = '';
+  for (let i = 0; i < 7; i++){
+    const d = new Date(ini); d.setDate(d.getDate()+i);
+    const lista = turnosDe(isoD(d));
+    const esHoy = mismoDia(d, new Date());
+    html += `<section class="bloque-dia ${esHoy ? 'hoy' : ''}">
+      <header class="bloque-head">
+        <span class="dname">${DIASC[d.getDay()]} ${d.getDate()}</span>
+        <span class="dcount">${lista.length}</span>
+      </header>
+      ${lista.length ? lista.map(t => cardTurno(t,true)).join('') : '<div class="vacio-mini">Sin turnos</div>'}
+    </section>`;
+  }
+  return html;
+}
+
+function renderMes(){
+  const y = fecha.getFullYear(), m = fecha.getMonth();
+  const offset = (new Date(y, m, 1).getDay() + 6) % 7;
+  const total = new Date(y, m+1, 0).getDate();
+  let celdas = '';
+  for (let i = 0; i < offset; i++) celdas += '<div class="celda vacia"></div>';
+  for (let d = 1; d <= total; d++){
+    const f = new Date(y, m, d); const fIso = isoD(f);
+    const lista = turnosDe(fIso);
+    const esHoy = mismoDia(f, new Date());
+    const sel = fIso === isoD(fecha);
+    const unidades = [...new Set(lista.map(t => (empById[t.empleado]||{}).unidad).filter(Boolean))];
+    const dots = unidades.map(uid => `<i style="background:${(uniById[uid]||{}).color || '#94a3b8'}"></i>`).join('');
+    celdas += `<button class="celda ${esHoy ? 'hoy' : ''} ${sel ? 'sel' : ''}" data-fecha="${fIso}">
+      <span class="num">${d}</span><span class="dots">${dots}</span>
+      ${lista.length > 4 ? `<span class="mas">+${lista.length - 4}</span>` : ''}
+    </button>`;
+  }
+  return `<div class="mes-grid">
+    ${['L','M','M','J','V','S','D'].map(l => `<div class="dow">${l}</div>`).join('')}
+    ${celdas}
+  </div>`;
+}
+
+function renderChips(){
+  $chipsUnidad.innerHTML = UNIDADES.map(u =>
+    `<button class="chip ${filtroUnidad === u.id ? 'on' : ''}" data-id="${u.id}" style="--c:${u.color}">
+       <i></i>${esc(u.nombre)}
+     </button>`).join('');
+}
+
+function render(){
+  const esTabla = (vista === 'sa' || vista === 'gp' || vista === 'nq');
+  const esHoy = (vista === 'hoy');
+  $main.classList.toggle('wide', esTabla);
+  document.querySelector('.chips-wrap').style.display = esTabla ? 'none' : 'flex';
+  document.getElementById('prev').style.display = (esTabla || esHoy) ? 'none' : 'grid';
+  document.getElementById('next').style.display = (esTabla || esHoy) ? 'none' : 'grid';
+  document.getElementById('btnHoy').style.display = (esTabla || esHoy) ? 'none' : 'block';
+  $titulo.textContent = tituloActual();
+  if (!esTabla) renderChips();
+  if (vista === 'hoy') {
+    const hoyReal = new Date();
+    fecha = hoyReal; // sync for consistency
+    $vista.innerHTML = renderDia();
+  }
+  else if (vista === 'dia')         $vista.innerHTML = renderDia();
+  else if (vista === 'semana') $vista.innerHTML = renderSemana();
+  else if (vista === 'mes')    $vista.innerHTML = renderMes();
+  else if (vista === 'sa')     $vista.innerHTML = renderMesChips() + renderSA();
+  else if (vista === 'gp')     $vista.innerHTML = renderMesChips() + renderGP();
+  else if (vista === 'nq')     $vista.innerHTML = renderMesChips() + renderNQ();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function mover(dir){
+  if (vista === 'dia') fecha.setDate(fecha.getDate() + dir);
+  else if (vista === 'semana') fecha.setDate(fecha.getDate() + 7*dir);
+  else if (vista === 'mes'){
+    const y = fecha.getFullYear(), m = fecha.getMonth() + dir;
+    const dia = Math.min(fecha.getDate(), new Date(y, m+1, 0).getDate());
+    fecha = new Date(y, m, dia);
+  }
+  render();
+}
+
+document.getElementById('prev').onclick = () => mover(-1);
+document.getElementById('next').onclick = () => mover(1);
+document.getElementById('btnHoy').onclick = () => {
+  fecha = new Date();
+  vista = 'hoy';
+  [...$tabs.children].forEach(t => t.classList.toggle('activo', t.dataset.v === 'hoy'));
+  render();
+};
+
+$tabs.addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  vista = b.dataset.v;
+  [...$tabs.children].forEach(t => t.classList.toggle('activo', t === b));
+  render();
+});
+
+$chipsUnidad.addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  const id = c.dataset.id;
+  filtroUnidad = (filtroUnidad === id) ? null : id;
+  render();
+});
+
+$vista.addEventListener('click', e => {
+  const mc = e.target.closest('.mchip');
+  if (mc){
+    const v = mc.dataset.mes;
+    filtroMes = (v === '') ? null : parseInt(v, 10);
+    render(); return;
+  }
+  const c = e.target.closest('.celda[data-fecha]');
+  if (c){
+    fecha = parseISO(c.dataset.fecha);
+    vista = 'dia';
+    [...$tabs.children].forEach(t => t.classList.toggle('activo', t.dataset.v === 'dia'));
+    render(); return;
+  }
+  const del = e.target.closest('[data-nq-del]');
+  if (del){
+    const i = parseInt(del.dataset.nqDel, 10);
+    NQ_SCHEDULES.splice(i, 1);
+    savePersisted();
+    buildAll(); render();
+    showToast('Horario eliminado', 'ok'); return;
+  }
+  if (e.target.id === 'nqClear'){
+    const form = document.getElementById('nqForm');
+    if (form) form.reset(); return;
+  }
+  if (e.target.id === 'srchApply'){ applySearchReplace(); return; }
+  const rcol = e.target.closest('[data-color-reset]');
+  if (rcol){
+    const name = rcol.dataset.colorReset;
+    delete COLOR_OVERRIDES[name];
+    savePersisted();
+    buildAll(); render();
+    showToast('Color restablecido', 'ok'); return;
+  }
+});
+
+$vista.addEventListener('input', e => {
+  if (e.target.id === 'srchFind')    srchState.find = e.target.value;
+  else if (e.target.id === 'srchReplace') srchState.replace = e.target.value;
+  else if (e.target.id === 'srchDate')    srchState.date = e.target.value;
+});
+
+$vista.addEventListener('change', e => {
+  const inp = e.target.closest('input[type="color"][data-color-name]');
+  if (!inp) return;
+  const name = inp.dataset.colorName;
+  COLOR_OVERRIDES[name] = inp.value;
+  savePersisted();
+  buildAll(); render();
+  showToast('Color actualizado', 'ok');
+});
+
+$btnEdit.addEventListener('click', () => {
+  if (editMode){
+    editMode = false;
+    document.body.classList.remove('edit-mode');
+    $btnEdit.classList.remove('active');
+    $btnEdit.textContent = '✏️ Editar';
+    savePersisted();
+    buildAll(); render();
+    showToast('Cambios guardados', 'ok');
+    return;
+  }
+  const pwd = prompt('Clave de administrador:');
+  if (pwd === null) return;
+  if (pwd !== EDIT_PASSWORD){ showToast('Clave incorrecta', 'err'); return; }
+  editMode = true;
+  document.body.classList.add('edit-mode');
+  $btnEdit.classList.add('active');
+  $btnEdit.textContent = '💾 Guardar';
+  if (vista !== 'sa' && vista !== 'gp'){
+    vista = 'sa';
+    [...$tabs.children].forEach(t => t.classList.toggle('activo', t.dataset.v === 'sa'));
+  }
+  render();
+  showToast('Editá los nombres directamente en las celdas', 'ok');
+});
+
+$vista.addEventListener('blur', (e) => {
+  const td = e.target.closest('td[contenteditable="true"][data-table]');
+  if (!td || !editMode) return;
+  const tableId = td.dataset.table;
+  const key = td.dataset.row + '-' + td.dataset.col;
+  const nuevo = td.textContent.trim();
+  if (!OVERRIDES[tableId]) OVERRIDES[tableId] = {};
+  OVERRIDES[tableId][key] = nuevo;
+  savePersisted();
+  buildAll();
+  showToast('✓ Guardado', 'ok');
+}, true);
+
+$vista.addEventListener('submit', (e) => {
+  if (e.target.id !== 'nqForm') return;
+  e.preventDefault();
+  const nombre  = document.getElementById('nq-nombre').value.trim();
+  const fechaNQ = document.getElementById('nq-fecha').value;
+  const tipo    = document.getElementById('nq-tipo').value.trim();
+  const ini     = document.getElementById('nq-ini').value;
+  const fin     = document.getElementById('nq-fin').value;
+  const unidad  = document.getElementById('nq-unidad').value;
+  const lugar   = document.getElementById('nq-lugar').value.trim();
+  const nota    = document.getElementById('nq-nota').value.trim();
+  if (!nombre || !fechaNQ || !ini || !fin){ showToast('Completá los campos obligatorios', 'err'); return; }
+  NQ_SCHEDULES.push({ nombre, fecha: fechaNQ, tipo: tipo || 'Turno', inicio: ini, fin, unidad, lugar, nota });
+  savePersisted();
+  buildAll(); render();
+  showToast('✓ Horario agregado', 'ok');
+});
+
+let tx = 0, ty = 0;
+$vista.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+$vista.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  const dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) mover(dx < 0 ? 1 : -1);
+}, { passive: true });
+
+render();
+console.log('✅ Cargados:', EMPLEADOS.length, 'colaboradores y', TURNOS.length, 'turnos');
+</script>
+</body>
+</html>
