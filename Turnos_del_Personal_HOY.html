@@ -3,126 +3,451 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Turnos SINERCOM</title>
+  <title>Turnos SHOP S-A - Octubre</title>
   <style>
     :root {
       --bg: #0a0a0a;
       --panel: #141414;
-      --border: #262626;
+      --panel-2: #1b1b1b;
+      --border: #2a2a2a;
       --text: #f1f5f9;
       --muted: #94a3b8;
-      --grad: linear-gradient(135deg, #DD2FB5 0%, #7A29E6 50%, #2632F0 100%);
+      --accent: #7a29e6;
+      --accent2: #2632f0;
     }
 
     * { box-sizing: border-box; }
     html, body {
       margin: 0;
-      width: 100%;
-      height: 100%;
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      padding: 24px 16px 48px;
     }
 
-    .topbar {
-      background: rgba(10,10,10,0.96);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      display: grid;
-      place-items: center;
-      background: var(--grad);
-      box-shadow: 0 8px 20px rgba(122, 41, 230, 0.35);
-      font-size: 1.2rem;
-    }
-
-    .title {
-      font-size: 1rem;
-      color: var(--text);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 7px 12px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      color: white;
-      background: var(--grad);
+    .header {
+      background: linear-gradient(135deg, #DD2FB5 0%, #7A29E6 50%, #2632F0 100%);
+      border-radius: 18px 18px 0 0;
+      padding: 18px 22px;
       border: 1px solid rgba(255,255,255,0.12);
     }
 
-    .frame-wrap {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
+    .title {
+      margin: 0;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 0.88rem;
+      opacity: 0.9;
+      font-weight: 600;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
       background: var(--panel);
-      border-top: 1px solid var(--border);
+      border: 1px solid var(--border);
+      border-top: 0;
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.22);
     }
 
-    iframe {
-      display: block;
+    table {
+      border-collapse: collapse;
+      min-width: 1500px;
       width: 100%;
-      height: 100%;
-      min-height: calc(100vh - 72px);
-      border: 0;
-      background: white;
+      font-size: 12px;
     }
 
-    @media (max-width: 640px) {
-      .topbar {
-        padding: 12px 14px;
-      }
-      .title {
-        font-size: 0.9rem;
-      }
-      .badge {
-        font-size: 0.68rem;
-      }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: center;
+      white-space: nowrap;
+      min-width: 54px;
+    }
+
+    thead th {
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    tbody th {
+      background: #191919;
+      color: var(--text);
+      font-weight: 800;
+      text-align: left;
+      padding-left: 12px;
+      min-width: 170px;
+    }
+
+    td.empty {
+      background: rgba(255,255,255,0.02);
+      color: #64748b;
+    }
+
+    .legend {
+      margin: 18px 0 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo">S</div>
-      <div class="title">Turnos del Personal</div>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">SHOP S-A - Octubre</h1>
+      <div class="subtitle">Horarios del personal por día</div>
     </div>
-    <div class="badge">Excel Online</div>
-  </div>
 
-  <div class="frame-wrap">
-    <iframe
-      src="https://sinercomsantafe-my.sharepoint.com/:x:/r/personal/juan_ramayo_sinercom_ar/_layouts/15/Doc.aspx?sourcedoc=%7BD206D1F8-DD1F-4CCD-AFD4-00333F6C3473%7D&file=Horarios%20%20agosto%2Cseptiembre%2Caoctubre.xlsx&action=default&mobileredirect=true&wdwpf=c&embed=true"
-      title="Planilla de horarios de SINERCOM"
-      allowfullscreen>
-    </iframe>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Horario</th>
+            <th>Puesto</th>
+            <th>1-oct.</th>
+            <th>2-oct.</th>
+            <th>3-oct.</th>
+            <th>4-oct.</th>
+            <th>5-oct.</th>
+            <th>6-oct.</th>
+            <th>7-oct.</th>
+            <th>8-oct.</th>
+            <th>9-oct.</th>
+            <th>10-oct.</th>
+            <th>11-oct.</th>
+            <th>12-oct.</th>
+            <th>13-oct.</th>
+            <th>14-oct.</th>
+            <th>15-oct.</th>
+            <th>16-oct.</th>
+            <th>17-oct.</th>
+            <th>18-oct.</th>
+            <th>19-oct.</th>
+            <th>20-oct.</th>
+            <th>21-oct.</th>
+            <th>22-oct.</th>
+            <th>23-oct.</th>
+            <th>24-oct.</th>
+            <th>25-oct.</th>
+            <th>26-oct.</th>
+            <th>27-oct.</th>
+            <th>28-oct.</th>
+            <th>29-oct.</th>
+            <th>30-oct.</th>
+            <th>31-oct.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>23:00 a 06:00</th>
+            <td>NOCHE</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Anneris Guerra</td>
+          </tr>
+
+          <tr>
+            <th>06:00 a 14:00</th>
+            <td>CAJA</td>
+            <td>Gomez Maca</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Lucila Nieto</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+          </tr>
+
+          <tr>
+            <th>06:00 a 14:00</th>
+            <td>CAFETERA</td>
+            <td>Joana Fritzler</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Gile Stafini</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+          </tr>
+
+          <tr>
+            <th>08:00 a 16:00</th>
+            <td>PS</td>
+            <td>Lucila Nieto</td>
+            <td>Ayelen Demaria</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Gomez Maca</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Gile Stafini</td>
+            <td>Anneris Guerra</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+          </tr>
+
+          <tr>
+            <th>10:00 a 18:00</th>
+            <td>REFUERZO</td>
+            <td>Ayelen Demaria</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>Gomez Maca</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>Anneris Guerra</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Ursprung Camila</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>Gomez Maca</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>Joana Fritzler</td>
+          </tr>
+
+          <tr>
+            <th>14:00 a 22:00</th>
+            <td>CAJA</td>
+            <td>Sofia de Filippi</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Anneris Guerra</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Joana Fritzler</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Ursprung Camila</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>Gomez Maca</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Lucila Nieto</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+          </tr>
+
+          <tr>
+            <th>14:00 a 22:00</th>
+            <td>CAFETERIA</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Joana Fritzler</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Gomez Maca</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Joana Fritzler</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Andrea Kummer</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+          </tr>
+
+          <tr>
+            <th>15:15 a 23:00</th>
+            <td>PS</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Gile Stafini</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Ursprung Camila</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>Gomez Maca</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>NIETO ROMINA</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Joana Fritzler</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Lucila Nieto</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Ayelen Demaria</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+            <td>Sofia de Filippi</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="legend">Datos de octubre actualizados para SHOP S-A.</div>
   </div>
 </body>
 </html>
